@@ -6,7 +6,10 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.formation.config.NotificationServiceConfig;
 import org.formation.domain.Livraison;
 import org.formation.domain.Livreur;
 import org.formation.domain.Status;
@@ -17,7 +20,13 @@ import org.formation.service.LivraisonService;
 @Logged
 public class LivraisonServiceImpl implements LivraisonService {
 
+	@Inject
+	NotificationServiceConfig notificationServiceConfig;
+	
 	List<Livraison> livraisons;
+	
+	@ConfigProperty(name = "quarkus.http.port") 
+	String port;
 	
 	@PostConstruct
 	public void init() {
@@ -29,6 +38,7 @@ public class LivraisonServiceImpl implements LivraisonService {
 	}
 	@Override
 	public List<Livraison> findAll() {
+		System.out.println("Notificaiton Service Config " + notificationServiceConfig);
 		return livraisons;
 	}
 
