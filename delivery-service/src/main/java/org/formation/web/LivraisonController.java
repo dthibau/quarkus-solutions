@@ -2,7 +2,6 @@ package org.formation.web;
 
 import java.util.List;
 
-
 import lombok.RequiredArgsConstructor;
 import org.formation.domain.Livraison;
 import org.formation.interceptor.Logged;
@@ -12,6 +11,8 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import io.quarkus.logging.Log;
+
 
 @Path("/livraisons")
 @RequiredArgsConstructor
@@ -23,6 +24,7 @@ public class LivraisonController {
     @Produces(MediaType.APPLICATION_JSON)
 	@Logged
 	public List<Livraison> findAll() {
+    	Log.debug("Message from Controller");
 		return livraisonService.findAll();
 	}
 
