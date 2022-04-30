@@ -2,6 +2,8 @@ package org.formation.domain;
 
 import java.time.Instant;
 
+import javax.validation.constraints.NotNull;
+
 import org.formation.web.Views;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -24,6 +26,7 @@ public class Livraison {
 	public Livreur livreur;
 	
 	@JsonView(Views.Base.class)
+	@NotNull
 	public Status status;
 	
 	@JsonView(Views.Complet.class)
