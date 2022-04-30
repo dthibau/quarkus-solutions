@@ -1,15 +1,19 @@
 package org.formation.service;
 
-import java.util.List;
+import java.util.Optional;
 
 import org.formation.domain.Livraison;
 import org.formation.domain.Livreur;
 
+import io.smallrye.mutiny.Multi;
+
 public interface LivraisonService {
 
-	public List<Livraison> findAll();
+	public Multi<Livraison> findAll();
 	
-	public void create(String noCommande);
+	public Optional<Livraison> load(Livraison livraison);
+	
+	public Livraison create(String noCommande);
 	
 	public void affect(Livraison livraison, Livreur livreur);
 	
