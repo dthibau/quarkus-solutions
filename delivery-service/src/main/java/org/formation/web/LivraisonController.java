@@ -19,7 +19,7 @@ import io.quarkus.logging.Log;
 public class LivraisonController {
 
 	@Inject
-	private LivraisonService livraisonService;
+	LivraisonService livraisonService;
 	
     @GET
     @Produces(MediaType.APPLICATION_JSON)
