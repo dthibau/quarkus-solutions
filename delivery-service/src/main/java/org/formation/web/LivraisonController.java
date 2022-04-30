@@ -25,6 +25,7 @@ import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import io.quarkus.logging.Log;
+import io.smallrye.common.annotation.Blocking;
 import io.smallrye.mutiny.Multi;
 
 
@@ -37,6 +38,7 @@ public class LivraisonController {
     @GET
     @Logged
     @JsonView(Views.Base.class)
+    @Blocking
 	public Multi<Livraison> findAll() {
     	Log.debug("Reactive call ");
 		return livraisonService.findAll();

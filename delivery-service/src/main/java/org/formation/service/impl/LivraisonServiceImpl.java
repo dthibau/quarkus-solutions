@@ -2,13 +2,15 @@ package org.formation.service.impl;
 
 import java.net.URI;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.transaction.Transactional;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
@@ -16,7 +18,6 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.formation.config.NotificationServiceConfig;
 import org.formation.domain.Livraison;
 import org.formation.domain.Livreur;
-import org.formation.domain.Review;
 import org.formation.domain.Status;
 import org.formation.interceptor.Logged;
 import org.formation.service.Courriel;
@@ -24,6 +25,7 @@ import org.formation.service.LivraisonService;
 import org.formation.service.NotificationService;
 
 import io.quarkus.logging.Log;
+import io.smallrye.common.annotation.Blocking;
 import io.smallrye.mutiny.Multi;
 
 @ApplicationScoped
@@ -38,48 +40,44 @@ public class LivraisonServiceImpl implements LivraisonService {
     
     private NotificationService notificationService2;
 	
-	List<Livraison> livraisons;
-	
+    @Inject
+    EntityManager em;
+    
 	@ConfigProperty(name = "quarkus.http.port") 
 	String port;
 		
 	@PostConstruct
 	public void init() {
-		livraisons = new ArrayList<>();
-		List<Review> reviews = new ArrayList<>();
-		reviews.add(new Review(1,5,"GOOD"));
-		reviews.add(new Review(1,3,"BAD"));
-		
-		Livreur livreur = Livreur.builder().id(1).nom("Speedy Gonzales").telephone("O6-49-79-99-69").reviews(reviews).build();
-		livraisons.add(Livraison.builder().id(1).noCommande("1").creationDate(Instant.now()).status(Status.DISTRIBUE).livreur(livreur).build());
-		livraisons.add(Livraison.builder().id(1).noCommande("2").creationDate(Instant.now()).status(Status.DISTRIBUE).livreur(livreur).build());
-		livraisons.add(Livraison.builder().id(1).noCommande("3").creationDate(Instant.now()).status(Status.DISTRIBUE).livreur(livreur).build());
-		livraisons.add(Livraison.builder().id(1).noCommande("4").creationDate(Instant.now()).status(Status.DISTRIBUE).livreur(livreur).build());		
-	
 		notificationService2 = RestClientBuilder.newBuilder()
 	            .baseUri(URI.create(notificationServiceConfig.url()))
 	            .build(NotificationService.class);
 	}
+	@SuppressWarnings("unchecked")
 	@Override
+	@Blocking
 	public Multi<Livraison> findAll() {
-		System.out.println("Notificaiton Service Config " + notificationServiceConfig);
-		return Multi.createFrom().items(livraisons.stream()); 
+		Query query = em.createQuery("from Livraison");
+		return Multi.createFrom().items(query.getResultStream()); 
 	}
+	@SuppressWarnings("unchecked")
 	@Override
+	@Transactional
 	public List<Livraison> findAllSync() {
-		return livraisons; 
+		return em.createQuery("from Livraison").getResultList(); 
 	}
 
 	@Override
+	@Transactional
 	public Optional<Livraison> load(Livraison livraison) {
-		int index = livraisons.indexOf(livraison);
-		return index == -1 ? Optional.empty() : Optional.of(livraisons.get(index));
+		Livraison ret = em.find(Livraison.class, livraison.getId());
+		return ret != null ? Optional.of(ret) : Optional.empty();
 	}
 		
 	@Override
+	@Transactional
 	public Livraison create(String noCommande) {
-		Livraison livraison = Livraison.builder().id(livraisons.size()+1).noCommande(noCommande).creationDate(Instant.now()).status(Status.CREE).build();
-		livraisons.add(livraison);
+		Livraison livraison = Livraison.builder().noCommande(noCommande).creationDate(Instant.now()).status(Status.CREE).build();
+		em.persist(livraison);
 		notificationService.sendMail(Courriel.builder().to("david.thibau@gmail.com").subject("Création Livraison").text(livraison.toString()).build());
 		notificationService2.sendMailReactive(Courriel.builder().to("david.thibau@gmail.com").subject("Création Livraison Builder").text(livraison.toString()).build())
 			.subscribe().with(e -> Log.info("Reactive Mail Sent " + e));
@@ -88,25 +86,24 @@ public class LivraisonServiceImpl implements LivraisonService {
 	}
 
 	@Override
+	@Transactional
 	public void affect(Livraison livraison, Livreur livreur) {
-		int index = livraisons.indexOf(livraison);
-		livraisons.get(index).setLivreur(livreur);
-		
+		livraison = (Livraison)em.find(Livraison.class, livraison.getId());
+		livraison.setLivreur(livreur);
 	}
 
 	@Override
+	@Transactional
 	public void start(Livraison livraison) {
-		int index = livraisons.indexOf(livraison);
-		livraisons.get(index).setStatus(Status.EN_COURS);
-		
+		livraison = (Livraison)em.find(Livraison.class, livraison.getId());
+		livraison.setStatus(Status.EN_COURS);
 	}
 
 	@Override
+	@Transactional
 	public void complete(Livraison livraison) {
-		int index = livraisons.indexOf(livraison);
-		 livraisons.get(index).setStatus(Status.DISTRIBUE);
-		
-		
+		livraison = (Livraison)em.find(Livraison.class, livraison.getId());
+		livraison.setStatus(Status.DISTRIBUE);
 	}
 
 }
