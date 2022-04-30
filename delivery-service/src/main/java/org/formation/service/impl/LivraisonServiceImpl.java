@@ -1,5 +1,6 @@
 package org.formation.service.impl;
 
+import java.net.URI;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,14 +11,19 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.rest.client.RestClientBuilder;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.formation.config.NotificationServiceConfig;
 import org.formation.domain.Livraison;
 import org.formation.domain.Livreur;
 import org.formation.domain.Review;
 import org.formation.domain.Status;
 import org.formation.interceptor.Logged;
+import org.formation.service.Courriel;
 import org.formation.service.LivraisonService;
+import org.formation.service.NotificationService;
 
+import io.quarkus.logging.Log;
 import io.smallrye.mutiny.Multi;
 
 @ApplicationScoped
@@ -27,11 +33,16 @@ public class LivraisonServiceImpl implements LivraisonService {
 	@Inject
 	NotificationServiceConfig notificationServiceConfig;
 	
+    @RestClient 
+    NotificationService notificationService;
+    
+    private NotificationService notificationService2;
+	
 	List<Livraison> livraisons;
 	
 	@ConfigProperty(name = "quarkus.http.port") 
 	String port;
-	
+		
 	@PostConstruct
 	public void init() {
 		livraisons = new ArrayList<>();
@@ -45,6 +56,9 @@ public class LivraisonServiceImpl implements LivraisonService {
 		livraisons.add(Livraison.builder().id(1).noCommande("3").creationDate(Instant.now()).status(Status.DISTRIBUE).livreur(livreur).build());
 		livraisons.add(Livraison.builder().id(1).noCommande("4").creationDate(Instant.now()).status(Status.DISTRIBUE).livreur(livreur).build());		
 	
+		notificationService2 = RestClientBuilder.newBuilder()
+	            .baseUri(URI.create(notificationServiceConfig.url()))
+	            .build(NotificationService.class);
 	}
 	@Override
 	public Multi<Livraison> findAll() {
@@ -66,6 +80,10 @@ public class LivraisonServiceImpl implements LivraisonService {
 	public Livraison create(String noCommande) {
 		Livraison livraison = Livraison.builder().id(livraisons.size()+1).noCommande(noCommande).creationDate(Instant.now()).status(Status.CREE).build();
 		livraisons.add(livraison);
+		notificationService.sendMail(Courriel.builder().to("david.thibau@gmail.com").subject("Création Livraison").text(livraison.toString()).build());
+		notificationService2.sendMailReactive(Courriel.builder().to("david.thibau@gmail.com").subject("Création Livraison Builder").text(livraison.toString()).build())
+			.subscribe().with(e -> Log.info("Reactive Mail Sent " + e));
+
 		return livraison;
 	}
 
