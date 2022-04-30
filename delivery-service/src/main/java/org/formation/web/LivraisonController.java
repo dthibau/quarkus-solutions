@@ -1,5 +1,7 @@
 package org.formation.web;
 
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -15,6 +17,8 @@ import org.jboss.resteasy.reactive.ResponseStatus;
 import org.jboss.resteasy.reactive.RestPath;
 import org.jboss.resteasy.reactive.RestQuery;
 
+import com.fasterxml.jackson.annotation.JsonView;
+
 import io.quarkus.logging.Log;
 import io.smallrye.mutiny.Multi;
 
@@ -27,13 +31,24 @@ public class LivraisonController {
 	
     @GET
     @Logged
+    @JsonView(Views.Base.class)
 	public Multi<Livraison> findAll() {
-    	Log.debug("Message from Controller");
+    	Log.debug("Reactive call ");
 		return livraisonService.findAll();
 	}
 
     @GET
+    @Path("/sync")
+    @Logged
+    @JsonView(Views.Base.class)
+	public List<Livraison> findAllSync() {
+    	Log.debug("Sync Call ");
+		return livraisonService.findAllSync();
+	}
+
+    @GET
     @Path("{id}")
+    @JsonView(Views.Complet.class)
     public Livraison findOne(@RestPath Long id) {
     	return livraisonService.load(Livraison.builder().id(id).build()).orElseThrow(() -> new RuntimeException());
     }

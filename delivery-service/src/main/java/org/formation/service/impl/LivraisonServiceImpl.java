@@ -13,6 +13,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.formation.config.NotificationServiceConfig;
 import org.formation.domain.Livraison;
 import org.formation.domain.Livreur;
+import org.formation.domain.Review;
 import org.formation.domain.Status;
 import org.formation.interceptor.Logged;
 import org.formation.service.LivraisonService;
@@ -34,15 +35,25 @@ public class LivraisonServiceImpl implements LivraisonService {
 	@PostConstruct
 	public void init() {
 		livraisons = new ArrayList<>();
-		livraisons.add(Livraison.builder().id(1).noCommande("1").creationDate(Instant.now()).status(Status.DISTRIBUE).build());
-		livraisons.add(Livraison.builder().id(1).noCommande("2").creationDate(Instant.now()).status(Status.DISTRIBUE).build());
-		livraisons.add(Livraison.builder().id(1).noCommande("3").creationDate(Instant.now()).status(Status.DISTRIBUE).build());
-		livraisons.add(Livraison.builder().id(1).noCommande("4").creationDate(Instant.now()).status(Status.DISTRIBUE).build());		
+		List<Review> reviews = new ArrayList<>();
+		reviews.add(new Review(1,5,"GOOD"));
+		reviews.add(new Review(1,3,"BAD"));
+		
+		Livreur livreur = Livreur.builder().id(1).nom("Speedy Gonzales").telephone("O6-49-79-99-69").reviews(reviews).build();
+		livraisons.add(Livraison.builder().id(1).noCommande("1").creationDate(Instant.now()).status(Status.DISTRIBUE).livreur(livreur).build());
+		livraisons.add(Livraison.builder().id(1).noCommande("2").creationDate(Instant.now()).status(Status.DISTRIBUE).livreur(livreur).build());
+		livraisons.add(Livraison.builder().id(1).noCommande("3").creationDate(Instant.now()).status(Status.DISTRIBUE).livreur(livreur).build());
+		livraisons.add(Livraison.builder().id(1).noCommande("4").creationDate(Instant.now()).status(Status.DISTRIBUE).livreur(livreur).build());		
+	
 	}
 	@Override
 	public Multi<Livraison> findAll() {
 		System.out.println("Notificaiton Service Config " + notificationServiceConfig);
 		return Multi.createFrom().items(livraisons.stream()); 
+	}
+	@Override
+	public List<Livraison> findAllSync() {
+		return livraisons; 
 	}
 
 	@Override
@@ -75,7 +86,7 @@ public class LivraisonServiceImpl implements LivraisonService {
 	@Override
 	public void complete(Livraison livraison) {
 		int index = livraisons.indexOf(livraison);
-		livraisons.get(index).setStatus(Status.DISTRIBUE);
+		 livraisons.get(index).setStatus(Status.DISTRIBUE);
 		
 		
 	}

@@ -2,6 +2,10 @@ package org.formation.domain;
 
 import java.util.List;
 
+import org.formation.web.Views;
+
+import com.fasterxml.jackson.annotation.JsonView;
+
 import lombok.Builder;
 import lombok.Data;
 
@@ -10,11 +14,16 @@ import lombok.Data;
 @Builder
 public class Livreur {
 
-	private long id;
+	@JsonView(Views.Base.class)
+	public long id;
 	
-	private String nom;
+	@JsonView(Views.Complet.class)
+	public String nom;
 	
-	private String telephone;
+	@JsonView(Views.Complet.class)
+	public String telephone;
 
-	private List<Review> reviews;
+	@JsonView(Views.Complet.class)
+	public List<Review> reviews;
+	
 }

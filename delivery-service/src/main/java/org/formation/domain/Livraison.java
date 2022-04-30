@@ -2,6 +2,11 @@ package org.formation.domain;
 
 import java.time.Instant;
 
+import org.formation.web.Views;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
+
 import lombok.Builder;
 import lombok.Data;
 
@@ -9,16 +14,43 @@ import lombok.Data;
 @Builder
 public class Livraison {
 
-	private long id;
+	@JsonView(Views.Base.class)
+	public long id;
 	
-	private String noCommande;
+	@JsonView(Views.Base.class)
+	public String noCommande;
 	
-	private Livreur livreur;
+	@JsonView(Views.Base.class)
+	public Livreur livreur;
 	
-	private Status status;
+	@JsonView(Views.Base.class)
+	public Status status;
 	
+	@JsonView(Views.Complet.class)
+	public Instant creationDate;
 
-	private Instant creationDate;
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (id ^ (id >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Livraison other = (Livraison) obj;
+		if (id != other.id)
+			return false;
+		return true;
+	}
+
 	
 	
 

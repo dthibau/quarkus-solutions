@@ -1,5 +1,6 @@
 package org.formation.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.formation.domain.Livraison;
@@ -10,6 +11,8 @@ import io.smallrye.mutiny.Multi;
 public interface LivraisonService {
 
 	public Multi<Livraison> findAll();
+	
+	public List<Livraison> findAllSync();
 	
 	public Optional<Livraison> load(Livraison livraison);
 	
