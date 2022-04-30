@@ -52,6 +52,15 @@ public class LivraisonController {
     	Log.debug("Sync Call ");
 		return livraisonService.findAllSync();
 	}
+    
+    @GET
+    @Path("/encours")
+    @Logged
+    @JsonView(Views.Base.class)
+	public List<Livraison> findAllEncours() {
+    	Log.debug("Encours Call ");
+		return livraisonService.findEncours();
+	}
 
     @GET
     @Path("{id}")

@@ -1,6 +1,7 @@
 package org.formation.domain;
 
 import java.time.Instant;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,6 +14,9 @@ import org.formation.web.Views;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.smallrye.mutiny.Uni;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,7 +27,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class Livraison {
+public class Livraison extends PanacheEntityBase {
 
 	@JsonView(Views.Base.class)
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,6 +47,10 @@ public class Livraison {
 	@JsonView(Views.Complet.class)
 	public Instant creationDate;
 
+	public static List<Livraison> findEnCours(){
+        return list("status", Status.EN_COURS);
+    }
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

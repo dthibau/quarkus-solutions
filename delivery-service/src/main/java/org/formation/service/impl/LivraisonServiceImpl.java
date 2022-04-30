@@ -66,10 +66,17 @@ public class LivraisonServiceImpl implements LivraisonService {
 		return em.createQuery("from Livraison").getResultList(); 
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional
+	public List<Livraison> findEncours() {
+		return Livraison.findEnCours(); 
+	}
+	
 	@Override
 	@Transactional
 	public Optional<Livraison> load(Livraison livraison) {
-		Livraison ret = em.find(Livraison.class, livraison.getId());
+		Livraison ret = Livraison.findById(livraison.getId());
 		return ret != null ? Optional.of(ret) : Optional.empty();
 	}
 		
@@ -77,7 +84,7 @@ public class LivraisonServiceImpl implements LivraisonService {
 	@Transactional
 	public Livraison create(String noCommande) {
 		Livraison livraison = Livraison.builder().noCommande(noCommande).creationDate(Instant.now()).status(Status.CREE).build();
-		em.persist(livraison);
+		Livraison.persist(livraison);
 		notificationService.sendMail(Courriel.builder().to("david.thibau@gmail.com").subject("Création Livraison").text(livraison.toString()).build());
 		notificationService2.sendMailReactive(Courriel.builder().to("david.thibau@gmail.com").subject("Création Livraison Builder").text(livraison.toString()).build())
 			.subscribe().with(e -> Log.info("Reactive Mail Sent " + e));
@@ -88,21 +95,21 @@ public class LivraisonServiceImpl implements LivraisonService {
 	@Override
 	@Transactional
 	public void affect(Livraison livraison, Livreur livreur) {
-		livraison = (Livraison)em.find(Livraison.class, livraison.getId());
+		livraison = Livraison.findById(livraison.getId());
 		livraison.setLivreur(livreur);
 	}
 
 	@Override
 	@Transactional
 	public void start(Livraison livraison) {
-		livraison = (Livraison)em.find(Livraison.class, livraison.getId());
+		livraison = Livraison.findById(livraison.getId());
 		livraison.setStatus(Status.EN_COURS);
 	}
 
 	@Override
 	@Transactional
 	public void complete(Livraison livraison) {
-		livraison = (Livraison)em.find(Livraison.class, livraison.getId());
+		Livraison.findById(livraison.getId());
 		livraison.setStatus(Status.DISTRIBUE);
 	}
 

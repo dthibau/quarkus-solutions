@@ -14,6 +14,8 @@ public interface LivraisonService {
 	
 	public List<Livraison> findAllSync();
 	
+	public List<Livraison> findEncours();
+	
 	public Optional<Livraison> load(Livraison livraison);
 	
 	public Livraison create(String noCommande);
