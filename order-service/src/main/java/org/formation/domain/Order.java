@@ -29,16 +29,14 @@ public class Order {
 	
 	private float discount;
 	
-	@Enumerated(EnumType.STRING)
-	private OrderStatus status;
-	
+
 	@Embedded
 	private PaymentInformation paymentInformation;
 	
 	@Embedded
 	  private DeliveryInformation deliveryInformation;
 	
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "order")
+	@OneToMany(cascade = CascadeType.ALL)
 	List<OrderItem> orderItems = new ArrayList<>();
 	
 }

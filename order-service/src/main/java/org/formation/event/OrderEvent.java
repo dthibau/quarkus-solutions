@@ -1,7 +1,6 @@
 package org.formation.event;
 
 import org.formation.domain.Order;
-import org.formation.domain.OrderStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

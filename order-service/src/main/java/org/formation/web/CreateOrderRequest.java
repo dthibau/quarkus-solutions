@@ -17,7 +17,7 @@ public class CreateOrderRequest {
 	  private Address deliveryAddress;
 	  private PaymentInformation paymentInformation;
 	  
-	  public Order getOrder() {
+	  public Order createOrder() {
 		  Order order = new Order();
 		  DeliveryInformation df = new DeliveryInformation();
 		  df.setAddress(deliveryAddress);  
