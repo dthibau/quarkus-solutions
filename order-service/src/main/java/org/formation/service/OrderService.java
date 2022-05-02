@@ -25,7 +25,7 @@ public class OrderService {
 	@Inject
 	OrderRepository orderRepository;
 	
-	@Channel("order")
+	@Channel("order-out")
     Emitter<OrderEvent> orderEventEmitter;
 	
 	@Transactional
