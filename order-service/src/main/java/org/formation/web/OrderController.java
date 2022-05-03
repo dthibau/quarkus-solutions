@@ -2,6 +2,7 @@ package org.formation.web;
 
 import java.util.List;
 
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -20,6 +21,7 @@ import org.jboss.resteasy.reactive.ResponseStatus;
 import io.smallrye.mutiny.Multi;
 
 @Path("/orders")
+@RolesAllowed("READER")
 public class OrderController {
 
 	@Inject
@@ -33,6 +35,7 @@ public class OrderController {
 	
 	@POST
 	@ResponseStatus(201)
+	@RolesAllowed("WRITER")
 	public Order createOrder(CreateOrderRequest request) {
 		
 		Order ret = orderService.createOrder(request);
