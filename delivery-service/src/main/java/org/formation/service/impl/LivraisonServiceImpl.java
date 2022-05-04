@@ -86,8 +86,8 @@ public class LivraisonServiceImpl implements LivraisonService {
 		Livraison livraison = Livraison.builder().noCommande(noCommande).creationDate(Instant.now()).status(Status.CREE).build();
 		Livraison.persist(livraison);
 		notificationService.sendMail(Courriel.builder().to("david.thibau@gmail.com").subject("Création Livraison").text(livraison.toString()).build());
-		notificationService2.sendMailReactive(Courriel.builder().to("david.thibau@gmail.com").subject("Création Livraison Builder").text(livraison.toString()).build())
-			.subscribe().with(e -> Log.info("Reactive Mail Sent " + e));
+//		notificationService2.sendMailReactive(Courriel.builder().to("david.thibau@gmail.com").subject("Création Livraison Builder").text(livraison.toString()).build())
+//			.subscribe().with(e -> Log.info("Reactive Mail Sent " + e));
 
 		return livraison;
 	}

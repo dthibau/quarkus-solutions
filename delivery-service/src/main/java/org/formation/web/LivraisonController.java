@@ -2,6 +2,7 @@ package org.formation.web;
 
 import java.util.List;
 
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.ws.rs.DELETE;
@@ -39,6 +40,7 @@ public class LivraisonController {
     @Logged
     @JsonView(Views.Base.class)
     @Blocking
+    @RolesAllowed("user")
 	public Multi<Livraison> findAll() {
     	Log.debug("Reactive call ");
 		return livraisonService.findAll();
@@ -57,6 +59,7 @@ public class LivraisonController {
     @Path("/encours")
     @Logged
     @JsonView(Views.Base.class)
+    @RolesAllowed("admin")
 	public List<Livraison> findAllEncours() {
     	Log.debug("Encours Call ");
 		return livraisonService.findEncours();
@@ -76,6 +79,7 @@ public class LivraisonController {
 
     @POST
     @ResponseStatus(201)
+    @RolesAllowed("admin")
     public Livraison create(@RestQuery String noCommande) {
     	return livraisonService.create(noCommande);
     }
@@ -83,6 +87,7 @@ public class LivraisonController {
     @PUT
     @Path("{id}")
     @ResponseStatus(204)
+    @RolesAllowed("admin")
     public void update(@RestPath Long id, @Valid Livraison livraison) {
     	
     }
@@ -90,18 +95,21 @@ public class LivraisonController {
     @PUT
     @Path("{id}/start")
     @ResponseStatus(204)
+    @RolesAllowed("admin")
     public void start(@RestPath Long id) {
     	livraisonService.start(Livraison.builder().id(id).build());
     }
     @PUT
     @Path("{id}/affect/{livreurId}")
     @ResponseStatus(204)
+    @RolesAllowed("admin")
     public void affect(@RestPath Long id, @RestPath Long livreurId) {
     	livraisonService.affect(Livraison.builder().id(id).build(), Livreur.builder().id(livreurId).build());
     }
     @PUT
     @Path("{id}/complete")
     @ResponseStatus(204)
+    @RolesAllowed("admin")
     public void complete(@RestPath Long id, @RestPath Long livreurId) {
     	livraisonService.complete(Livraison.builder().id(id).build());
     }
@@ -109,6 +117,7 @@ public class LivraisonController {
     @DELETE
     @Path("{id}")
     @ResponseStatus(204)
+    @RolesAllowed("admin")
     public void delete(@RestPath Long id) {
     	
     }
