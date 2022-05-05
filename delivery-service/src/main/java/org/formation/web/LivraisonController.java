@@ -27,6 +27,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import io.quarkus.logging.Log;
 import io.smallrye.common.annotation.Blocking;
 import io.smallrye.mutiny.Multi;
+import io.smallrye.mutiny.Uni;
 
 
 @Path("/livraisons")
@@ -50,14 +51,14 @@ public class LivraisonController {
     @JsonView(Views.Base.class)
 	public List<Livraison> findAllSync() {
     	Log.debug("Sync Call ");
-		return livraisonService.findAllSync();
+		return null;
 	}
 
     @GET
     @Path("{id}")
     @JsonView(Views.Complet.class)
-    public Livraison findOne(@RestPath Long id) {
-    	return livraisonService.load(Livraison.builder().id(id).build()).orElseThrow(() -> new NotFoundException("No such livraison " + id));
+    public Uni<Livraison> findOne(@RestPath Long id) {
+    	return livraisonService.load(Livraison.builder().id(id).build());
     }
 
     @ServerExceptionMapper
@@ -67,22 +68,23 @@ public class LivraisonController {
 
     @POST
     @ResponseStatus(201)
-    public Livraison create(@RestQuery String noCommande) {
+    public Uni<Livraison> create(@RestQuery String noCommande) {
     	return livraisonService.create(noCommande);
     }
     
     @PUT
     @Path("{id}")
     @ResponseStatus(204)
-    public void update(@RestPath Long id, @Valid Livraison livraison) {
-    	
+    public Uni<Livraison> update(@RestPath Long id, @Valid Livraison livraison) {
+
+    	return livraisonService.affect(livraison,Livreur.builder().id(id).build());
     }
 
     @PUT
     @Path("{id}/start")
     @ResponseStatus(204)
-    public void start(@RestPath Long id) {
-    	livraisonService.start(Livraison.builder().id(id).build());
+    public Uni<Livraison> start(@RestPath Long id) {
+    	return livraisonService.start(Livraison.builder().id(id).build());
     }
     @PUT
     @Path("{id}/affect/{livreurId}")

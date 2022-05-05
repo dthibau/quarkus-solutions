@@ -13,6 +13,7 @@ import org.formation.web.Views;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
+import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,7 +24,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class Livraison {
+public class Livraison extends PanacheEntityBase {
 
 	@JsonView(Views.Base.class)
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)

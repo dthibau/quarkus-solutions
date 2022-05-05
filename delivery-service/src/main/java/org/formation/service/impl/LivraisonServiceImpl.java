@@ -2,14 +2,11 @@ package org.formation.service.impl;
 
 import java.net.URI;
 import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import javax.transaction.Transactional;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -20,13 +17,12 @@ import org.formation.domain.Livraison;
 import org.formation.domain.Livreur;
 import org.formation.domain.Status;
 import org.formation.interceptor.Logged;
-import org.formation.service.Courriel;
 import org.formation.service.LivraisonService;
 import org.formation.service.NotificationService;
 
-import io.quarkus.logging.Log;
-import io.smallrye.common.annotation.Blocking;
+import io.quarkus.hibernate.reactive.panache.common.runtime.ReactiveTransactional;
 import io.smallrye.mutiny.Multi;
+import io.smallrye.mutiny.Uni;
 
 @ApplicationScoped
 @Logged
@@ -54,56 +50,71 @@ public class LivraisonServiceImpl implements LivraisonService {
 	}
 	@SuppressWarnings("unchecked")
 	@Override
-	@Blocking
 	public Multi<Livraison> findAll() {
-		Query query = em.createQuery("from Livraison");
-		return Multi.createFrom().items(query.getResultStream()); 
+		return Livraison.findAll().stream();
+	
 	}
+//	@SuppressWarnings("unchecked")
+//	@Override
+//	@Transactional
+//	public List<Livraison> findAllSync() {
+//		List<Livraison> ret = new ArrayList<>();
+//		Livraison.findAll().stream().collect().in(ret, (col, item) -> col.add(item));
+//		return ret;
+//	}
+
 	@SuppressWarnings("unchecked")
 	@Override
-	@Transactional
-	public List<Livraison> findAllSync() {
-		return em.createQuery("from Livraison").getResultList(); 
-	}
-
-	@Override
-	@Transactional
-	public Optional<Livraison> load(Livraison livraison) {
-		Livraison ret = em.find(Livraison.class, livraison.getId());
-		return ret != null ? Optional.of(ret) : Optional.empty();
+	public Uni<Livraison> load(Livraison livraison) {
+		return Livraison.findById(livraison.getId());
+//				.onItem();
+//				.ifNull().failWith(() -> new NotFoundException());	
 	}
 		
 	@Override
-	@Transactional
-	public Livraison create(String noCommande) {
+	@ReactiveTransactional
+	public Uni<Livraison> create(String noCommande) {
 		Livraison livraison = Livraison.builder().noCommande(noCommande).creationDate(Instant.now()).status(Status.CREE).build();
-		em.persist(livraison);
-		notificationService.sendMail(Courriel.builder().to("david.thibau@gmail.com").subject("Création Livraison").text(livraison.toString()).build());
-		notificationService2.sendMailReactive(Courriel.builder().to("david.thibau@gmail.com").subject("Création Livraison Builder").text(livraison.toString()).build())
-			.subscribe().with(e -> Log.info("Reactive Mail Sent " + e));
-
-		return livraison;
+		return livraison.persist();
+		
+//		em.persist(livraison);
+//		notificationService.sendMail(Courriel.builder().to("david.thibau@gmail.com").subject("Création Livraison").text(livraison.toString()).build());
+//		notificationService2.sendMailReactive(Courriel.builder().to("david.thibau@gmail.com").subject("Création Livraison Builder").text(livraison.toString()).build())
+//			.subscribe().with(e -> Log.info("Reactive Mail Sent " + e));
+//
+//		return livraison;
 	}
 
 	@Override
-	@Transactional
-	public void affect(Livraison livraison, Livreur livreur) {
-		livraison = (Livraison)em.find(Livraison.class, livraison.getId());
-		livraison.setLivreur(livreur);
+	@ReactiveTransactional
+	public Uni<Livraison> affect(Livraison livraison, Livreur livreur) {
+		return Livraison.<Livraison>findById(livraison.getId()).onItem().invoke((l) -> {
+//			(Uni<Livraison>)Livraison.findById(livraison.getId())
+//			.onItem();
+			l.setLivreur(livreur);
+		});
+//		Livraison.update("livreur = ? where id=?" , livreur,livraison.getId()).subscribe();
+
 	}
 
 	@Override
-	@Transactional
-	public void start(Livraison livraison) {
-		livraison = (Livraison)em.find(Livraison.class, livraison.getId());
-		livraison.setStatus(Status.EN_COURS);
+	@ReactiveTransactional
+	public Uni<Livraison> start(Livraison livraison) {
+		return Livraison.<Livraison>findById(livraison.getId()).onItem().invoke((l) -> {
+			l.setStatus(Status.EN_COURS);
+		});
+		
+//		livraison = (Livraison)em.find(Livraison.class, livraison.getId());
+//		livraison.setStatus(Status.EN_COURS);
 	}
 
 	@Override
-	@Transactional
-	public void complete(Livraison livraison) {
-		livraison = (Livraison)em.find(Livraison.class, livraison.getId());
-		livraison.setStatus(Status.DISTRIBUE);
+	@ReactiveTransactional
+	public Uni<Livraison> complete(Livraison livraison) {
+		return Livraison.<Livraison>findById(livraison.getId()).onItem().invoke((l) -> {
+			l.setStatus(Status.DISTRIBUE);
+		});
+
 	}
 
 }
