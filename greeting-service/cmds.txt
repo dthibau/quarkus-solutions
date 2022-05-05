@@ -1,0 +1,6 @@
+-- Commande de construction et push
+quarkus build -DskipTests -Dquarkus.container-image.push=true
+
+-- Démarrage du container
+docker run -p 8080:8000 dthibau/quarkus-greetings
+
