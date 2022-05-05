@@ -4,3 +4,13 @@ quarkus build -DskipTests -Dquarkus.container-image.push=true
 -- Démarrage du container
 docker run -p 8080:8000 dthibau/quarkus-greetings
 
+-- 
+kubectl apply -f ./target/kubernetes/kubernetes.yml
+
+kubectl port-forward service/greeting-service 8080:80
+
+
+--- 
+kubectl get po -o jsonpath='{.items[0].status.hostIP}'
+kubectl get greeting-service -o jsonpath='{.spec.ports[?(@.name=="http2")].nodePort}'
+
