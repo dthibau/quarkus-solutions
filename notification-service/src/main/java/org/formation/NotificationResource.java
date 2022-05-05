@@ -1,5 +1,6 @@
 package org.formation;
 
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -10,6 +11,7 @@ import io.quarkus.mailer.reactive.ReactiveMailer;
 import io.smallrye.mutiny.Uni;
 
 @Path("/notifications")
+//@RolesAllowed("admin")
 public class NotificationResource {
 
 	@Inject Mailer mailer;     
