@@ -83,6 +83,7 @@ public class LivraisonServiceImpl implements LivraisonService {
 	@Override
 	@Transactional
 	public Livraison create(String noCommande) {
+		Log.info("create Order");
 		Livraison livraison = Livraison.builder().noCommande(noCommande).creationDate(Instant.now()).status(Status.CREE).build();
 		Livraison.persist(livraison);
 		notificationService.sendMail(Courriel.builder().to("david.thibau@gmail.com").subject("Création Livraison").text(livraison.toString()).build());
