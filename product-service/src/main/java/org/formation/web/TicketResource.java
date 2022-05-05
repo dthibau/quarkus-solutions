@@ -13,6 +13,10 @@ import org.formation.service.TicketService;
 import org.jboss.resteasy.reactive.RestPath;
 import org.jboss.resteasy.reactive.RestQuery;
 
+import com.mongodb.client.result.UpdateResult;
+
+import io.smallrye.mutiny.Uni;
+
 @Path("/tickets")
 public class TicketResource {
 
@@ -21,6 +25,12 @@ public class TicketResource {
 	@GET
 	public List<Ticket> findAll() {
 		return Ticket.listAll();
+	}
+	
+	@GET
+	@Path("/reactive")
+	public Uni<List<Ticket>> findAllReactive() {
+		return ticketService.list();
 	}
 	
 	@POST
@@ -32,5 +42,11 @@ public class TicketResource {
 	@Path("/{ticketId}/pickup")
 	public Ticket noteTicketReadyToPickUp(@RestPath String ticketId) {
 		return ticketService.readyToPickUp(ticketId);
+	}
+	
+	@POST
+	@Path("/reactive/{ticketId}/pickup")
+	public Uni<UpdateResult> noteTicketReadyToPickUpReactive(@RestPath String ticketId) {
+		return ticketService.readyToPickUpReactive(ticketId);
 	}
 }
