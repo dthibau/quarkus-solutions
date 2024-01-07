@@ -15,8 +15,14 @@ import jakarta.ws.rs.core.MediaType;
 @Path("/livraisons")
 public class LivraisonController {
 
-	private LivraisonService livraisonService;
+	private final LivraisonService livraisonService;
 	
+
+	public LivraisonController(LivraisonService livraisonService) {
+		super();
+		this.livraisonService = livraisonService;
+	}
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
 	public List<Livraison> findAll() {
