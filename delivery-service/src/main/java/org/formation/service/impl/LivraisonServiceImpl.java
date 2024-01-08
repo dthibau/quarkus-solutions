@@ -36,7 +36,7 @@ public class LivraisonServiceImpl implements LivraisonService {
 	
 	@PostConstruct
 	public void init() throws JsonProcessingException {
-		log.info("Listening to port : " + port);
+		log.info("Listening to port :  " + port);
 		log.info("Notification service config : " + notificationServiceConfig.completeUrl());
 		
 		livraisons = new ArrayList<>();
