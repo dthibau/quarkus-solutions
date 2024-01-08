@@ -4,23 +4,41 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.formation.config.NotificationServiceConfig;
 import org.formation.domain.Livraison;
 import org.formation.domain.Livreur;
 import org.formation.domain.Status;
 import org.formation.interceptor.Logged;
 import org.formation.service.LivraisonService;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.quarkus.vertx.http.runtime.devmode.Json;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import lombok.extern.java.Log;
 
 @ApplicationScoped
 @Logged
+@Log
 public class LivraisonServiceImpl implements LivraisonService {
+
+	@ConfigProperty(name = "quarkus.http.port") 
+	String port;
+	@Inject
+	NotificationServiceConfig notificationServiceConfig;
+
 
 	List<Livraison> livraisons;
 	
 	@PostConstruct
-	public void init() {
+	public void init() throws JsonProcessingException {
+		log.info("Listening to port : " + port);
+		log.info("Notification service config : " + notificationServiceConfig.completeUrl());
+		
 		livraisons = new ArrayList<>();
 		livraisons.add(Livraison.builder().id(1).noCommande("1").creationDate(Instant.now()).status(Status.DISTRIBUE).build());
 		livraisons.add(Livraison.builder().id(1).noCommande("2").creationDate(Instant.now()).status(Status.DISTRIBUE).build());
