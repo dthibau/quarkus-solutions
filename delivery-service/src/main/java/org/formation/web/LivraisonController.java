@@ -5,6 +5,7 @@ import java.util.List;
 
 
 import org.formation.domain.Livraison;
+import org.formation.interceptor.Logged;
 import org.formation.service.LivraisonService;
 
 import jakarta.ws.rs.GET;
@@ -25,6 +26,7 @@ public class LivraisonController {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+	@Logged
 	public List<Livraison> findAll() {
 		return livraisonService.findAll();
 	}
