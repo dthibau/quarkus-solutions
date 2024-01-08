@@ -9,9 +9,11 @@ import jakarta.enterprise.context.ApplicationScoped;
 import org.formation.domain.Livraison;
 import org.formation.domain.Livreur;
 import org.formation.domain.Status;
+import org.formation.interceptor.Logged;
 import org.formation.service.LivraisonService;
 
 @ApplicationScoped
+@Logged
 public class LivraisonServiceImpl implements LivraisonService {
 
 	List<Livraison> livraisons;
