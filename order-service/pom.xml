@@ -53,6 +53,13 @@
       <artifactId>quarkus-junit5</artifactId>
       <scope>test</scope>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/io.quarkus/quarkus-test-vertx -->
+<dependency>
+    <groupId>io.quarkus</groupId>
+    <artifactId>quarkus-test-vertx</artifactId>
+    <scope>test</scope>
+</dependency>
+
   </dependencies>
   <build>
     <plugins>
