@@ -2,12 +2,15 @@ package org.formation.domain;
 
 import java.util.List;
 
+import io.quarkus.mongodb.panache.PanacheMongoEntity;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
-public class Ticket  {
+@EqualsAndHashCode(callSuper=false)
+public class Ticket extends PanacheMongoEntity {
 
-	String orderId;
+	Long orderId;
 	
 	private TicketStatus status;
 	
