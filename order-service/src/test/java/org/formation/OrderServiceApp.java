@@ -1,4 +1,4 @@
-package org.acme;
+package org.formation;
 
 import org.junit.jupiter.api.Test;
 
