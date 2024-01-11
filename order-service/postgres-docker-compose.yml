@@ -1,0 +1,37 @@
+version: '3'
+services:
+  panache-postgresql:
+    image: postgres
+    volumes:
+      - panache_db:/var/lib/postgresql
+      - panache_data:/var/lib/postgresql/data
+    networks:
+      - back
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - 5432:5432
+
+  pgadmin4:
+    image: dpage/pgadmin4:8.2
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "admin@admin.com"
+      PGADMIN_DEFAULT_PASSWORD: "admin"
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+       - panache_pgadmin:/var/lib/pgadmin
+    ports:
+      - "81:80"
+    depends_on:
+      - panache-postgresql
+    networks:
+      - back
+volumes:
+  panache_data:
+  panache_db:
+  panache_pgadmin:
+
+networks:
+  back:
+
