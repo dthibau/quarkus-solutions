@@ -9,7 +9,7 @@ public interface LivraisonService {
 
 	public List<Livraison> findAll();
 	
-	public void create(String noCommande);
+	public Livraison create(String noCommande);
 	
 	public void affect(Livraison livraison, Livreur livreur);
 	
