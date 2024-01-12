@@ -2,9 +2,9 @@ package org.formation.domain;
 
 import java.time.Instant;
 
+import org.formation.web.LivraisonViews;
 
-
-
+import com.fasterxml.jackson.annotation.JsonView;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -27,17 +27,22 @@ import lombok.NoArgsConstructor;
 public class Livraison {
 
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+	@JsonView(LivraisonViews.Base.class)
 	public long id;
-	
+
+	@JsonView(LivraisonViews.Base.class)
 	public String noCommande;
 	
 	@OneToOne
+	@JsonView(LivraisonViews.Base.class)
 	public Livreur livreur;
 	
 	@NotNull
 	@Enumerated(EnumType.STRING)
+	@JsonView(LivraisonViews.Base.class)
 	public Status status;
 	
+	@JsonView(LivraisonViews.Base.class)
 	public Instant creationDate;
 
 	@Override

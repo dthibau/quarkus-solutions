@@ -1,5 +1,9 @@
 package org.formation.domain;
 
+import org.formation.web.LivraisonViews;
+
+import com.fasterxml.jackson.annotation.JsonView;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,9 +21,12 @@ import lombok.NoArgsConstructor;
 public class Review {
 
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+	@JsonView(LivraisonViews.Complet.class)
 	public long id;
 	
+	@JsonView(LivraisonViews.Complet.class)
 	public int note;
 	
+	@JsonView(LivraisonViews.Complet.class)
 	public String commentaire;
 }
