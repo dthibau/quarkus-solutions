@@ -7,6 +7,8 @@ import java.time.Instant;
 
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -33,6 +35,7 @@ public class Livraison {
 	public Livreur livreur;
 	
 	@NotNull
+	@Enumerated(EnumType.STRING)
 	public Status status;
 	
 	public Instant creationDate;
