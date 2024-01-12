@@ -9,6 +9,7 @@ import org.jboss.resteasy.reactive.ResponseStatus;
 
 import io.smallrye.mutiny.Uni;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -32,7 +33,7 @@ public class OrderController {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @ResponseStatus(201)
-    public Uni<Order> createOrder(OrderRequest orderRequest) {
+    public Uni<Order> createOrder(@Valid OrderRequest orderRequest) {
         return orderService.createOrder(orderRequest.getLineItems(), orderRequest.getDeliveryAddress(), orderRequest.getPaymentInformation());
     }
 }
