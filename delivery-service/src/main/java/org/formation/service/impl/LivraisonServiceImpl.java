@@ -8,12 +8,15 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.formation.config.NotificationServiceConfig;
 import org.formation.domain.Livraison;
 import org.formation.domain.Livreur;
 import org.formation.domain.Status;
 import org.formation.interceptor.Logged;
 import org.formation.service.LivraisonService;
+import org.formation.service.NotificationDto;
+import org.formation.service.NotificationService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 
@@ -28,6 +31,9 @@ public class LivraisonServiceImpl implements LivraisonService {
     @Inject
     NotificationServiceConfig notificationServiceConfig;
 
+	@RestClient 
+    NotificationService notificationService;
+
 	@Inject
 	EntityManager entityManager;
 
@@ -41,6 +47,8 @@ public class LivraisonServiceImpl implements LivraisonService {
 	public Livraison create(String noCommande) {
 		Livraison livraison = Livraison.builder().noCommande(noCommande).creationDate(Instant.now()).status(Status.CREE).build();
 		entityManager.persist(livraison);
+
+		notificationService.sendMail(NotificationDto.builder().to("david.thibau@gmail.com").subject("Création Livraison").text(livraison.toString()).build());
 		return livraison;
 	}
 	
