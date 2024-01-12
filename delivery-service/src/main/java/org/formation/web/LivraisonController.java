@@ -10,6 +10,8 @@ import org.jboss.resteasy.reactive.ResponseStatus;
 import org.jboss.resteasy.reactive.RestPath;
 import org.jboss.resteasy.reactive.RestQuery;
 
+import com.fasterxml.jackson.annotation.JsonView;
+
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -29,6 +31,7 @@ public class LivraisonController {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
 	@Logged
+    @JsonView(LivraisonViews.Base.class)
 	public List<Livraison> findAll() {
     	Log.debug("Message from Controller");
 		return livraisonService.findAll();
@@ -36,7 +39,8 @@ public class LivraisonController {
 
 	@GET
     @Path("{id}")
-    public Livraison findOne(Long id) {
+    @JsonView(LivraisonViews.Complet.class)
+    public Livraison findOne(@RestPath Long id) {
     	return livraisonService.load(id).orElseThrow(() -> new EntityNotFoundException("No such Livraison " + id));
     }
 

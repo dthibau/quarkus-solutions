@@ -24,6 +24,7 @@ public class LivreurEntityTest {
     public void initializeSequence() {
         String sql = "ALTER SEQUENCE livreur_seq RESTART WITH 1000"; // Remplacez "ma_entite_id_seq" par le nom réel de votre séquence
         entityManager.createNativeQuery(sql).executeUpdate();
+
     }
 
     @Test
