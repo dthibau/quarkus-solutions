@@ -2,6 +2,7 @@ package org.formation.service;
 
 import java.util.List;
 
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.formation.domain.Address;
 import org.formation.domain.DeliveryInformation;
 import org.formation.domain.Order;
@@ -10,6 +11,7 @@ import org.formation.domain.OrderRepository;
 import org.formation.domain.PaymentInformation;
 
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
+import io.quarkus.logging.Log;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -17,6 +19,10 @@ import jakarta.inject.Inject;
 @ApplicationScoped
 public class OrderService {
     
+    @RestClient
+    @Inject
+    NotificationService notificationService;
+
     @Inject
     OrderRepository orderRepository;
 
@@ -28,7 +34,10 @@ public class OrderService {
 		order.setDeliveryInformation(df);
 		order.setOrderItems(lineItems);
 		order.setPaymentInformation(paymentInformation);
-        
+
+        NotificationDto dto = NotificationDto.builder().to("david.thibau@gmail.com").subject("Order created").text(order.toString()).build();
+        notificationService.sendMail(dto).subscribe().with(n -> Log.info("Notification sent " + n), 
+                                                           f -> Log.error("Error sending notification " + f));
         return orderRepository.persist(order);
     }
 }
