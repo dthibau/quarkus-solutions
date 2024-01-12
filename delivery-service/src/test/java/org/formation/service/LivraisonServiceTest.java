@@ -47,10 +47,10 @@ public class LivraisonServiceTest {
 
         entityManager.clear();
 
-        livraisonService.start(livraison);
+        livraisonService.start(livraison.id);
 
         entityManager.clear();
 
-        assertEquals(Status.CREE, livraisonService.findAll().get(0).getStatus());
+        assertEquals(Status.CREE, livraisonService.load(livraison.id).get().getStatus());
     }
 }
