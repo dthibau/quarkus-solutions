@@ -10,6 +10,7 @@ import org.formation.domain.OrderRepository;
 import org.formation.domain.PaymentInformation;
 
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
+import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -20,7 +21,7 @@ public class OrderService {
     OrderRepository orderRepository;
 
     @WithTransaction
-    public void createOrder(List<OrderItem> lineItems, Address deliveryAddress, PaymentInformation paymentInformation) {
+    public Uni<Order> createOrder(List<OrderItem> lineItems, Address deliveryAddress, PaymentInformation paymentInformation) {
         Order order = new Order();
 		DeliveryInformation df = new DeliveryInformation();
 		df.setAddress(deliveryAddress);  
@@ -28,6 +29,6 @@ public class OrderService {
 		order.setOrderItems(lineItems);
 		 order.setPaymentInformation(paymentInformation);
         
-         orderRepository.persist(order);
+        return orderRepository.persist(order);
     }
 }
