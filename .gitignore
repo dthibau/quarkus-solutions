@@ -41,3 +41,4 @@ nb-configuration.xml
 .jbang
 .sdkmanrc
 .envrc
+*.log
