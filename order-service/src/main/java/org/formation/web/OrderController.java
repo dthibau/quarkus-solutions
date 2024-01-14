@@ -8,6 +8,7 @@ import org.formation.service.OrderService;
 import org.jboss.resteasy.reactive.ResponseStatus;
 
 import io.smallrye.mutiny.Uni;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
@@ -17,6 +18,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.MediaType;
 
 @Path("/orders")
+@RolesAllowed("user")
 public class OrderController {
     
     @Inject
@@ -26,6 +28,7 @@ public class OrderController {
     OrderService orderService;
     
     @GET
+    @RolesAllowed("admin")
     public Uni<List<Order>> getOrders() {
         return orderRepository.findAll().list();
     }
