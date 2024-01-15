@@ -18,7 +18,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.MediaType;
 
 @Path("/orders")
-//@RolesAllowed("user")
+@RolesAllowed("user")
 public class OrderController {
     
     @Inject
@@ -28,7 +28,7 @@ public class OrderController {
     OrderService orderService;
     
     @GET
-    // @RolesAllowed("admin")
+    @RolesAllowed("admin")
     public Uni<List<Order>> getOrders() {
         return orderRepository.findAll().list();
     }
