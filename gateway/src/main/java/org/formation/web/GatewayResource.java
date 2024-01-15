@@ -16,8 +16,8 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 
 @Path("/")
-public class GatewayResource {
-    
+@Authenticated
+public class GatewayResource { 
 
     @RestClient
     @Inject
