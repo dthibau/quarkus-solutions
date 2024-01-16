@@ -10,7 +10,7 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 
 @Path("/notifications")
-@RolesAllowed("default-roles-quarkus")
+// @RolesAllowed("default-roles-quarkus")
 public class NotificationResource {
 
 	@Inject Mailer mailer;     
