@@ -71,6 +71,10 @@
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-kind</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
       <artifactId>quarkus-junit5</artifactId>
       <scope>test</scope>
     </dependency>
@@ -80,10 +84,10 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-    <groupId>io.quarkus</groupId>
-    <artifactId>quarkus-junit5-mockito</artifactId>
-    <scope>test</scope>
-</dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-junit5-mockito</artifactId>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
