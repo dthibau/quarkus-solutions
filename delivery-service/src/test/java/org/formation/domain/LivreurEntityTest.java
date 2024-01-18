@@ -61,19 +61,18 @@ public class LivreurEntityTest {
     @Test
     public void testAddThenEraseReview() {
 
-        Livreur speedy = Livreur.findById(1);
-        
-        speedy.addReview(Review.builder().commentaire("Trop rapide !").note(5).build());
+       
+        Livreur.addReview(1l, Review.builder().commentaire("Trop rapide !").note(5).build());
 
         entityManager.flush();
         entityManager.clear();
 
-        speedy = Livreur.findById(1);
+        Livreur speedy = Livreur.findById(1);
 
         // Assertion sur add
         assertEquals(1, speedy.reviews.size());
 
-        speedy.resetReviews();
+        Livreur.resetReviews(speedy.id);
 
         entityManager.flush();
         entityManager.clear();
