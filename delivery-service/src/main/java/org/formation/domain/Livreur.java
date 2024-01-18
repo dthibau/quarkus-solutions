@@ -37,15 +37,15 @@ public class Livreur extends PanacheEntity {
         return list("status", StatusLivreur.ACTIF);
     }
 
-	public void addReview(Review review) {
-		Livreur me = Livreur.findById(id);
-		me.reviews.add(review);
+	public static Livreur addReview(Long id, Review review) {
+		Livreur livreur = (Livreur)Livreur.findByIdOptional(id).orElseThrow(() -> new IllegalArgumentException("Livreur not found"));
+		livreur.reviews.add(review);
+		return livreur;
 	}
 
-	public Livreur resetReviews() {
-		Livreur me = findById(id);
+	public static Livreur resetReviews(Long id) {
+		Livreur me = (Livreur)Livreur.findByIdOptional(id).orElseThrow(() -> new IllegalArgumentException("Livreur not found"));
 		me.reviews.clear();
 		return me;
-
 	}        
 }
