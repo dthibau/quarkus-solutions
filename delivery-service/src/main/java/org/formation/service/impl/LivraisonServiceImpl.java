@@ -6,57 +6,72 @@ import java.util.List;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import lombok.extern.java.Log;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.formation.config.NotificationServiceConfig;
 import org.formation.domain.Livraison;
 import org.formation.domain.Livreur;
 import org.formation.domain.Status;
 import org.formation.interceptor.Logged;
 import org.formation.service.LivraisonService;
 
+
 @ApplicationScoped
 @Logged
+@Log
 public class LivraisonServiceImpl implements LivraisonService {
+
+    @ConfigProperty(name = "quarkus.http.port")
+    String port;
+    @Inject
+    NotificationServiceConfig notificationServiceConfig;
 
 	List<Livraison> livraisons;
 
-	@PostConstruct
-	public void init() {
-		livraisons = new ArrayList<>();
-		livraisons.add(Livraison.builder().id(1).noCommande("1").creationDate(Instant.now()).status(Status.DISTRIBUE).build());
-		livraisons.add(Livraison.builder().id(1).noCommande("2").creationDate(Instant.now()).status(Status.DISTRIBUE).build());
-		livraisons.add(Livraison.builder().id(1).noCommande("3").creationDate(Instant.now()).status(Status.DISTRIBUE).build());
-		livraisons.add(Livraison.builder().id(1).noCommande("4").creationDate(Instant.now()).status(Status.DISTRIBUE).build());		
-	}
-	@Override
-	public List<Livraison> findAll() {
-		return livraisons;
-	}
+    @PostConstruct
+    public void init() {
+        log.info("Listening to port : " + port);
+        log.info("Notification service config : " + notificationServiceConfig.completeUrl());
 
-	@Override
-	public void create(String noCommande) {
-		livraisons.add(Livraison.builder().id(livraisons.size()+1).noCommande(noCommande).creationDate(Instant.now()).status(Status.CREE).build());
-		
-	}
+        livraisons = new ArrayList<>();
+        livraisons.add(Livraison.builder().id(1).noCommande("1").creationDate(Instant.now()).status(Status.DISTRIBUE).build());
+        livraisons.add(Livraison.builder().id(1).noCommande("2").creationDate(Instant.now()).status(Status.DISTRIBUE).build());
+        livraisons.add(Livraison.builder().id(1).noCommande("3").creationDate(Instant.now()).status(Status.DISTRIBUE).build());
+        livraisons.add(Livraison.builder().id(1).noCommande("4").creationDate(Instant.now()).status(Status.DISTRIBUE).build());
+    }
 
-	@Override
-	public void affect(Livraison livraison, Livreur livreur) {
-		int index = livraisons.indexOf(livraison);
-		livraisons.get(index).setLivreur(livreur);
-		
-	}
+    @Override
+    public List<Livraison> findAll() {
+        return livraisons;
+    }
 
-	@Override
-	public void start(Livraison livraison) {
-		int index = livraisons.indexOf(livraison);
-		livraisons.get(index).setStatus(Status.EN_COURS);
-		
-	}
+    @Override
+    public void create(String noCommande) {
+        livraisons.add(Livraison.builder().id(livraisons.size() + 1).noCommande(noCommande).creationDate(Instant.now()).status(Status.CREE).build());
 
-	@Override
-	public void complete(Livraison livraison) {
-		int index = livraisons.indexOf(livraison);
-		livraisons.get(index).setStatus(Status.DISTRIBUE);
-		
-		
-	}
+    }
+
+    @Override
+    public void affect(Livraison livraison, Livreur livreur) {
+        int index = livraisons.indexOf(livraison);
+        livraisons.get(index).setLivreur(livreur);
+
+    }
+
+    @Override
+    public void start(Livraison livraison) {
+        int index = livraisons.indexOf(livraison);
+        livraisons.get(index).setStatus(Status.EN_COURS);
+
+    }
+
+    @Override
+    public void complete(Livraison livraison) {
+        int index = livraisons.indexOf(livraison);
+        livraisons.get(index).setStatus(Status.DISTRIBUE);
+
+
+    }
 
 }
