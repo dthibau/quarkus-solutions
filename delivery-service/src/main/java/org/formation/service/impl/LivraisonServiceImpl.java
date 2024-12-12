@@ -2,6 +2,7 @@ package org.formation.service.impl;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import lombok.extern.java.Log;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.formation.config.NotificationServiceConfig;
@@ -18,6 +19,7 @@ import jakarta.persistence.EntityManager;
 @ApplicationScoped
 @Logged
 @Log
+@Transactional
 public class LivraisonServiceImpl implements LivraisonService {
 
     @ConfigProperty(name = "quarkus.http.port")

@@ -49,8 +49,8 @@ public class LivraisonServiceTest {
 
         livraisonService.start(livraison);
 
-        entityManager.clear();
+        entityManager.flush();
 
-        assertEquals(Status.CREE, livraisonService.findAll().get(0).getStatus());
+        assertEquals(Status.EN_COURS, livraisonService.findAll().get(0).getStatus());
     }
 }
