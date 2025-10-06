@@ -12,7 +12,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
     <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
-    <quarkus.platform.version>3.17.3</quarkus.platform.version>
+    <quarkus.platform.version>3.28.2</quarkus.platform.version>
     <skipITs>true</skipITs>
     <surefire-plugin.version>3.5.0</surefire-plugin.version>
     <lombok.version>1.18.36</lombok.version>
@@ -53,6 +53,13 @@
       <artifactId>quarkus-junit5</artifactId>
       <scope>test</scope>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/io.quarkus/quarkus-test-vertx -->
+<dependency>
+    <groupId>io.quarkus</groupId>
+    <artifactId>quarkus-test-vertx</artifactId>
+    <scope>test</scope>
+</dependency>
+
   </dependencies>
   <build>
     <plugins>
