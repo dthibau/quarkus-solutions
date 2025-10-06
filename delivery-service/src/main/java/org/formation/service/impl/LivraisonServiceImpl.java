@@ -4,15 +4,20 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.ws.rs.POST;
 import org.formation.domain.Livraison;
 import org.formation.domain.Livreur;
 import org.formation.domain.Status;
 import org.formation.service.LivraisonService;
 
+@ApplicationScoped
 public class LivraisonServiceImpl implements LivraisonService {
 
 	List<Livraison> livraisons;
-	
+
+	@PostConstruct
 	public void init() {
 		livraisons = new ArrayList<>();
 		livraisons.add(Livraison.builder().id(1).noCommande("1").creationDate(Instant.now()).status(Status.DISTRIBUE).build());
