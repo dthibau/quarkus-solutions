@@ -36,7 +36,7 @@ public class LivraisonController {
 
 	@GET
     @Path("{id}")
-    public Livraison findOne(@RestPath Long id) {
+    public Livraison findOne(Long id) {
     	return livraisonService.load(id).orElseThrow(() -> new EntityNotFoundException("No such Livraison " + id));
     }
 

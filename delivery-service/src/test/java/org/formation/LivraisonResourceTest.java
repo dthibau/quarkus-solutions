@@ -5,6 +5,7 @@ import io.quarkus.test.common.http.TestHTTPResource;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
 import static io.restassured.RestAssured.given;
+import static io.restassured.http.ContentType.JSON;
 import static org.hamcrest.Matchers.*;
 import java.net.URL;
 import org.formation.web.LivraisonController;
@@ -33,7 +34,9 @@ class LivraisonResourceTest {
     void whenCreateLivraisonsCheckStatusAndId() {
         
         given()
-          .when().post(livraisonsUrl.getPath()+"?noCommande=1234")
+                .contentType(JSON)
+                .queryParam("noCommande", "1234")
+          .when().post()
           .then()
              .statusCode(201)
              .body("id", equalTo(5))
