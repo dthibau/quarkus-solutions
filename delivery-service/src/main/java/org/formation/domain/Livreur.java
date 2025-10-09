@@ -25,21 +25,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@JsonView(LivraisonViews.Complet.class)
 public class Livreur extends PanacheEntity {
 
-	@JsonView(LivraisonViews.Complet.class)
+
 	public String nom;
 	
-	@JsonView(LivraisonViews.Complet.class)
 	public String telephone;
 
 	@NotNull
 	@Enumerated(EnumType.STRING)
-	@JsonView(LivraisonViews.Complet.class)
 	public StatusLivreur status;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	@JsonView(LivraisonViews.Complet.class)
 	public List<Review> reviews;
 	
 	public static List<Livreur> findActifLivreurs(){

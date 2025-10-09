@@ -18,15 +18,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Entity
+@JsonView(LivraisonViews.Complet.class)
 public class Review {
 
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-	@JsonView(LivraisonViews.Complet.class)
 	public long id;
 	
-	@JsonView(LivraisonViews.Complet.class)
 	public int note;
 	
-	@JsonView(LivraisonViews.Complet.class)
 	public String commentaire;
 }
