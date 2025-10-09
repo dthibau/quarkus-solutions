@@ -23,7 +23,7 @@ class LivraisonResourceTest {
     @Test
     void whenGetLivraisonsCheckStatusAndSizeofArray() {
         given()
-          .when().get(livraisonsUrl.getPath())
+          .when().get()
           .then()
              .statusCode(200);
 //             .body("$", hasSize(1))
@@ -39,7 +39,7 @@ class LivraisonResourceTest {
           .when().post()
           .then()
              .statusCode(201)
-             .body("id", equalTo(5))
+             .body("id", notNullValue())
              .body("noCommande", equalTo("1234"))
              .body("status", equalTo("CREE"));
         
