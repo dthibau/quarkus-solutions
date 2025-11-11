@@ -11,7 +11,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 public class OrderRepository implements PanacheRepository<Order> {
     
     public Uni<List<Order>> findOrdersWithDiscount() {
-        return find("discount IS NOT NULL").list();
+        return find("discount > ?1", 0).list();
     }
 
     public Uni<List<Order>> findOrdersPosteriorTo(Instant instant) {

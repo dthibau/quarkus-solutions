@@ -1,6 +1,7 @@
 package org.formation.domain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -25,24 +26,53 @@ public class OrderRepositoryTest {
 
     @Test
     @TestReactiveTransaction
-    public void testDiscount(UniAsserter asserter) {
-        Order noDiscountOrder = Order.builder().build();
-        Order discountOrder = Order.builder().discount(10.0f).build();
-        asserter.execute(() -> orderRepository.persist(noDiscountOrder));
-        asserter.execute(() -> orderRepository.persistAndFlush(discountOrder));
+    void should_return_only_discounted_orders(UniAsserter asserter) {
+        Order noDiscount = Order.builder().discount(0f).build();
+        Order nullDiscount = Order.builder().build();
+        Order tenPercent = Order.builder().discount(10f).build();
+        Order fivePercent = Order.builder().discount(5f).build();
 
-        asserter.assertNotNull(() -> orderRepository.findOrdersWithDiscount()); 
+        // Reset propre par test (rollback assuré par @TestReactiveTransaction)
+        asserter.execute(orderRepository::deleteAll);
+
+        // Données de test
+        asserter.execute(() -> orderRepository.persist(noDiscount));
+        asserter.execute(() -> orderRepository.persist(nullDiscount));
+        asserter.execute(() -> orderRepository.persist(tenPercent));
+        asserter.execute(() -> orderRepository.persistAndFlush(fivePercent));
+
+        // Assertions sur le résultat
+        asserter.assertThat(
+                () -> orderRepository.findOrdersWithDiscount(),
+                (List<Order> result) -> {
+                    assertEquals(2, result.size(), "On attend uniquement les commandes avec discount > 0");
+                    assertTrue(result.stream().allMatch(o -> o.getDiscount() > 0));
+                }
+        );
     }
+
 
     @Test
     @TestReactiveTransaction
-    public void testPosterior(UniAsserter asserter) {
-        Instant tomorrow = Instant.now();
-        tomorrow.plus(Duration.ofDays(1));
+    void should_filter_orders_posterior_to_cutoff(UniAsserter asserter) {
+        Instant now = Instant.now();
+        Instant yesterday = now.minus(Duration.ofDays(1));
+        Instant tomorrow = now.plus(Duration.ofDays(1)); // (le code original n’affectait pas la valeur)
 
-        Order futurOrder = Order.builder().date(tomorrow).build();
-        asserter.execute(() -> orderRepository.persist(futurOrder));
+        Order past = Order.builder().date(yesterday).build();
+        Order future = Order.builder().date(tomorrow).build();
 
-        asserter.assertNotNull(() -> orderRepository.findOrdersPosteriorTo(Instant.now())); 
+        asserter.execute(orderRepository::deleteAll);
+        asserter.execute(() -> orderRepository.persist(past));
+        asserter.execute(() -> orderRepository.persistAndFlush(future));
+
+        asserter.assertThat(
+                () -> orderRepository.findOrdersPosteriorTo(now),
+                (List<Order> result) -> {
+                    assertEquals(1, result.size(), "Seule la commande future doit être renvoyée");
+                    assertEquals(tomorrow, result.get(0).getDate());
+                }
+        );
     }
+
 }
