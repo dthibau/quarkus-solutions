@@ -42,13 +42,13 @@ public class OrderRepositoryTest {
         asserter.execute(() -> orderRepository.persistAndFlush(fivePercent));
 
         // Assertions sur le résultat
- /*       asserter.assertThat(
+        asserter.assertThat(
                 () -> orderRepository.findOrdersWithDiscount(),
                 (List<Order> result) -> {
                     assertEquals(2, result.size(), "On attend uniquement les commandes avec discount > 0");
                     assertTrue(result.stream().allMatch(o -> o.getDiscount() > 0));
                 }
-        );*/
+        );
     }
 
 
@@ -66,13 +66,13 @@ public class OrderRepositoryTest {
         asserter.execute(() -> orderRepository.persist(past));
         asserter.execute(() -> orderRepository.persistAndFlush(future));
 
-/*        asserter.assertThat(
+        asserter.assertThat(
                 () -> orderRepository.findOrdersPosteriorTo(now),
                 (List<Order> result) -> {
                     assertEquals(1, result.size(), "Seule la commande future doit être renvoyée");
                     assertEquals(tomorrow, result.get(0).getDate());
                 }
-        );*/
+        );
     }
 
 }
