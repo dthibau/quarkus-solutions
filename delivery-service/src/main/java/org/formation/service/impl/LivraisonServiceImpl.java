@@ -3,6 +3,7 @@ package org.formation.service.impl;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -34,6 +35,12 @@ public class LivraisonServiceImpl implements LivraisonService {
     EntityManager entityManager;
 
     @Override
+    public Optional<Livraison> load(long id) {
+        return entityManager.find(Livraison.class, id) != null ?
+                Optional.of(entityManager.find(Livraison.class, id)) : Optional.empty();
+    }
+
+    @Override
     public List<Livraison> findAll() {
         return entityManager.createQuery("from Livraison ", Livraison.class).getResultList();
     }
@@ -51,17 +58,17 @@ public class LivraisonServiceImpl implements LivraisonService {
     }
 
     @Override
-    public void affect(Livraison livraison, Livreur livreur) {
-        livraison = entityManager.find(Livraison.class, livraison.getId());
+    public void affect(Long idLivraison, Long idLivreur) {
+        Livraison livraison = entityManager.find(Livraison.class, idLivraison);
         // livreur = entityManager.find(Livreur.class, livreur.getId());
-        livraison.setLivreur(livreur);
+        livraison.setLivreur(entityManager.find(Livreur.class, idLivreur));
         livraison.setStatus(Status.LIVREUR_AFFECTE);
     }
 
     @Override
-    public void start(Livraison livraison) {
+    public void start(Long idLivraison) {
+        Livraison livraison = entityManager.find(Livraison.class, idLivraison);
         livraison.status = Status.EN_COURS;
-        entityManager.merge(livraison);
     }
 
     @Override

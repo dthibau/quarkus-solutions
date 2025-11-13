@@ -49,7 +49,7 @@ public class LivraisonServiceTest {
 
         entityManager.clear();
 
-        livraisonService.start(livraison);
+        livraisonService.start(livraison.getId());
 
         entityManager.flush();
 
