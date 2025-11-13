@@ -31,4 +31,8 @@ public class OrderService {
         
         return orderRepository.persist(order);
     }
+
+    public Uni<List<Order>> findAll() {
+        return orderRepository.listAll();
+    }
 }
