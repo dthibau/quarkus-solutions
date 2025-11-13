@@ -2,23 +2,57 @@ package org.formation.domain;
 
 import java.time.Instant;
 
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
 public class Livraison {
 
-	private long id;
+	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+	public long id;
 	
-	private String noCommande;
+	public String noCommande;
 	
-	private Livreur livreur;
+	@OneToOne
+	public Livreur livreur;
 	
-	private Status status;
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	public Status status;
 	
+	public Instant creationDate;
 
-	private Instant creationDate;
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (id ^ (id >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Livraison other = (Livraison) obj;
+		if (id != other.id)
+			return false;
+		return true;
+	}
+
 	
 	
 
