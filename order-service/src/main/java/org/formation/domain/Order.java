@@ -4,21 +4,18 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
 @Table(name = "t_order")
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Order {
 
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,7 +32,7 @@ public class Order {
 	@Embedded
 	  private DeliveryInformation deliveryInformation;
 	
-	@OneToMany(cascade = CascadeType.ALL)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	List<OrderItem> orderItems = new ArrayList<>();
 	
 }
