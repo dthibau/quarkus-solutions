@@ -2,6 +2,7 @@ package org.formation.domain;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -16,6 +17,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.formation.web.LivraisonViews;
 
 
 @Data
@@ -23,9 +25,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@JsonView(LivraisonViews.Full.class)
 public class Livreur extends PanacheEntity {
 
-	
+
 	public String nom;
 	
 	public String telephone;
@@ -36,7 +39,12 @@ public class Livreur extends PanacheEntity {
 
 	@OneToMany(cascade = CascadeType.ALL)
 	public List<Review> reviews;
-	
+
+	@JsonView(LivraisonViews.Base.class)
+	public Long getId() {
+		return id;
+	}
+
     public static List<Livreur> findActifs() {
 		StatusLivreur status = StatusLivreur.ACTIF;
 		return list("status", status);

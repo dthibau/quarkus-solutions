@@ -3,18 +3,21 @@ package org.formation.domain;
 import java.time.Instant;
 
 
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.formation.web.LivraisonViews;
 
 @Data
 @Builder
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonView(LivraisonViews.Base.class)
 public class Livraison {
 
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -18,6 +18,7 @@ import org.formation.domain.Livreur;
 import org.formation.domain.Status;
 import org.formation.interceptor.Logged;
 import org.formation.service.LivraisonService;
+import org.hibernate.Hibernate;
 
 
 @ApplicationScoped
@@ -36,8 +37,13 @@ public class LivraisonServiceImpl implements LivraisonService {
 
     @Override
     public Optional<Livraison> load(long id) {
-        return entityManager.find(Livraison.class, id) != null ?
-                Optional.of(entityManager.find(Livraison.class, id)) : Optional.empty();
+        Livraison livraison = entityManager.find(Livraison.class, id);
+        if ( livraison == null )
+            return Optional.empty();
+        if ( livraison.livreur != null) {
+            Hibernate.initialize(livraison.livreur.reviews);
+        }
+         return Optional.of(livraison);
     }
 
     @Override

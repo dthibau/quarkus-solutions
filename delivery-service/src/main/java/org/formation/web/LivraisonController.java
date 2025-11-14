@@ -2,6 +2,7 @@ package org.formation.web;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import lombok.RequiredArgsConstructor;
 import org.formation.domain.Livraison;
 import org.formation.interceptor.Logged;
@@ -29,6 +30,7 @@ public class LivraisonController {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Logged
+	@JsonView(LivraisonViews.Base.class)
 	public List<Livraison> findAll() {
 		Log.debug("Message from Controller");
 		return livraisonService.findAll();
@@ -36,6 +38,7 @@ public class LivraisonController {
 
 	@GET
 	@Path("{id}")
+	@JsonView(LivraisonViews.Full.class)
 	public Livraison findOne(Long id) {
 		return livraisonService.load(id).orElseThrow(() -> new EntityNotFoundException("No such Livraison " + id));
 	}
