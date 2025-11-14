@@ -1,6 +1,7 @@
 package org.formation.web;
 
 import io.smallrye.mutiny.Uni;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -15,11 +16,13 @@ import java.util.List;
 
 @Path("/orders")
 @RequiredArgsConstructor
+@RolesAllowed("user")
 public class OrderResource {
 
     private final OrderService orderService;
 
     @GET
+    @RolesAllowed("admin")
     public Uni<List<Order>> getOrders() {
         return orderService.findAll();
     }
