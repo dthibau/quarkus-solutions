@@ -5,6 +5,8 @@ import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.RequiredArgsConstructor;
 import org.formation.domain.*;
+import org.formation.domain.event.OrderEvent;
+import org.formation.domain.event.OrderEventType;
 
 import java.util.List;
 
@@ -14,6 +16,7 @@ import java.util.List;
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    private final PublishService publishService;
 
     public Uni<Order> createOrder(List<OrderItem> lineItems,
                                   Address deliveryAddress,
@@ -26,7 +29,11 @@ public class OrderService {
                 .paymentInformation(paymentInformation)
                 .build();
 
-        return orderRepository.persist(order);
+        Uni<Order> ret = orderRepository.persist(order).onItem().invoke(savedOrder -> {
+            OrderEvent orderEvent = OrderEvent.builder().order(savedOrder).type(OrderEventType.CREATED).build();
+            publishService.publishOrderEvent(orderEvent);
+        });
+        return ret;
     }
 
     public Uni<List<Order>> findAll() {
