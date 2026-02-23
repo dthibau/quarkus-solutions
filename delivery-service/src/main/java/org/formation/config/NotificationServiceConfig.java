@@ -4,6 +4,7 @@ import io.smallrye.config.ConfigMapping;
 import io.smallrye.config.WithDefault;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import org.hibernate.validator.constraints.Length;
 
 import java.util.Optional;
@@ -18,15 +19,14 @@ public interface NotificationServiceConfig {
     @NotEmpty
     String host();
 
-    @WithDefault("8080")
-    int port();
+    Optional<Integer> port();
 
     Optional<String> rootUrl();
 
-    @Length(min = 10)
+    @Size(min = 10)
     String token();
 
     default String completeUrl() {
-        return protocol() + "://" + host() + ":" + port() + rootUrl().orElse("");
+        return protocol() + "://" + host() + ":" + port().orElse(8080) + rootUrl().orElse("");
     }
 }

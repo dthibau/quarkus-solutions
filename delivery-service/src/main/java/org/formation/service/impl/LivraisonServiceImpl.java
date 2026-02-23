@@ -7,6 +7,7 @@ import java.util.List;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.formation.config.NotificationServiceConfig;
@@ -18,12 +19,12 @@ import org.formation.service.LivraisonService;
 
 @ApplicationScoped
 @Log
+@RequiredArgsConstructor
 public class LivraisonServiceImpl implements LivraisonService {
 
     @ConfigProperty(name = "quarkus.http.port")
     String port;
-    @Inject
-    NotificationServiceConfig notificationServiceConfig;
+    private final  NotificationServiceConfig notificationServiceConfig;
 
 	List<Livraison> livraisons;
 
