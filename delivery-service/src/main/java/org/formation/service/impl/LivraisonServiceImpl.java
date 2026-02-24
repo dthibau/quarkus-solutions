@@ -32,8 +32,8 @@ public class LivraisonServiceImpl implements LivraisonService {
 
     @PostConstruct
     public void init() {
-        log.info("Listening to port : " + port);
-        log.info("Notification service config : " + notificationServiceConfig.completeUrl());
+        log.fine("Listening to port : " + port);
+        log.fine("Notification service config : " + notificationServiceConfig.completeUrl());
 
         livraisons = new ArrayList<>();
         livraisons.add(Livraison.builder().id(1).noCommande("1").creationDate(Instant.now()).status(Status.DISTRIBUE).build());
@@ -44,6 +44,8 @@ public class LivraisonServiceImpl implements LivraisonService {
 
     @Override
     public List<Livraison> findAll() {
+        log.fine("Listening to port : " + port);
+        log.fine("Notification service config : " + notificationServiceConfig.completeUrl());
         return livraisons;
     }
 
