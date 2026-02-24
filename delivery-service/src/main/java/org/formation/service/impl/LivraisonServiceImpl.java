@@ -7,6 +7,7 @@ import java.util.List;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -27,53 +28,40 @@ public class LivraisonServiceImpl implements LivraisonService {
     @ConfigProperty(name = "quarkus.http.port")
     String port;
     private final  NotificationServiceConfig notificationServiceConfig;
+    private final EntityManager entityManager;
 
-	List<Livraison> livraisons;
-
-    @PostConstruct
-    public void init() {
-        log.fine("Listening to port : " + port);
-        log.fine("Notification service config : " + notificationServiceConfig.completeUrl());
-
-        livraisons = new ArrayList<>();
-        livraisons.add(Livraison.builder().id(1).noCommande("1").creationDate(Instant.now()).status(Status.DISTRIBUE).build());
-        livraisons.add(Livraison.builder().id(1).noCommande("2").creationDate(Instant.now()).status(Status.DISTRIBUE).build());
-        livraisons.add(Livraison.builder().id(1).noCommande("3").creationDate(Instant.now()).status(Status.DISTRIBUE).build());
-        livraisons.add(Livraison.builder().id(1).noCommande("4").creationDate(Instant.now()).status(Status.DISTRIBUE).build());
-    }
 
     @Override
     public List<Livraison> findAll() {
         log.fine("Listening to port : " + port);
         log.fine("Notification service config : " + notificationServiceConfig.completeUrl());
-        return livraisons;
+        return entityManager.createQuery("from Livraison").getResultList();
     }
 
     @Override
-    public void create(String noCommande) {
-        livraisons.add(Livraison.builder().id(livraisons.size() + 1).noCommande(noCommande).creationDate(Instant.now()).status(Status.CREE).build());
-
+    public Livraison create(String noCommande) {
+        Livraison livraison = Livraison.builder().noCommande(noCommande).creationDate(Instant.now()).status(Status.CREE).build();
+        entityManager.persist(livraison);
+        return livraison;
     }
 
     @Override
     public void affect(Livraison livraison, Livreur livreur) {
-        int index = livraisons.indexOf(livraison);
-        livraisons.get(index).setLivreur(livreur);
+        livraison.setLivreur(livreur);
+        entityManager.merge(livraison);
 
     }
 
     @Override
     public void start(Livraison livraison) {
-        int index = livraisons.indexOf(livraison);
-        livraisons.get(index).setStatus(Status.EN_COURS);
-
+        livraison.setStatus(Status.EN_COURS);
+        entityManager.merge(livraison);
     }
 
     @Override
     public void complete(Livraison livraison) {
-        int index = livraisons.indexOf(livraison);
-        livraisons.get(index).setStatus(Status.DISTRIBUE);
-
+        livraison.setStatus(Status.DISTRIBUE);
+        entityManager.merge(livraison);
 
     }
 
