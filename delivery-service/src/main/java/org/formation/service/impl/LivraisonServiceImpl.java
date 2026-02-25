@@ -3,11 +3,13 @@ package org.formation.service.impl;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -39,6 +41,12 @@ public class LivraisonServiceImpl implements LivraisonService {
     }
 
     @Override
+    public Optional<Livraison> load(Long id) {
+        return entityManager.find(Livraison.class, id) != null ?
+                      Optional.of(entityManager.find(Livraison.class, id)) : Optional.empty();
+    }
+
+    @Override
     public Livraison create(String noCommande) {
         Livraison livraison = Livraison.builder().noCommande(noCommande).creationDate(Instant.now()).status(Status.CREE).build();
         entityManager.persist(livraison);
@@ -46,22 +54,30 @@ public class LivraisonServiceImpl implements LivraisonService {
     }
 
     @Override
-    public void affect(Livraison livraison, Livreur livreur) {
+    public void affect(Long idLivraison, Long idLivreur) {
+        Livraison livraison = entityManager.find(Livraison.class,idLivraison);
+        Livreur livreur = entityManager.find(Livreur.class,idLivreur);
         livraison.setLivreur(livreur);
         entityManager.merge(livraison);
 
     }
 
     @Override
-    public void start(Livraison livraison) {
+    public void start(Long id) {
+        Livraison livraison = entityManager.find(Livraison.class,id);
+        if ( livraison == null ) {
+            throw new EntityNotFoundException("No such livraison "+id);
+        }
         livraison.setStatus(Status.EN_COURS);
-        entityManager.merge(livraison);
     }
 
     @Override
-    public void complete(Livraison livraison) {
+    public void complete(Long id) {
+        Livraison livraison = entityManager.find(Livraison.class,id);
+        if ( livraison == null ) {
+            throw new EntityNotFoundException("No such livraison "+id);
+        }
         livraison.setStatus(Status.DISTRIBUE);
-        entityManager.merge(livraison);
 
     }
 
