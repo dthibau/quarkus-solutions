@@ -2,6 +2,8 @@ package org.formation.service;
 
 import java.util.List;
 
+import io.quarkus.logging.Log;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.formation.domain.Address;
 import org.formation.domain.DeliveryInformation;
 import org.formation.domain.Order;
@@ -23,6 +25,8 @@ public class OrderService {
     OrderRepository orderRepository;
     @Inject
     PublishService publishService;
+    @RestClient
+    NotificationService notificationService;
 
     @WithTransaction
     public Uni<Order> createOrder(List<OrderItem> lineItems, Address deliveryAddress, PaymentInformation paymentInformation) {
@@ -32,12 +36,22 @@ public class OrderService {
 		order.setDeliveryInformation(df);
 		order.setOrderItems(lineItems);
 		order.setPaymentInformation(paymentInformation);
-        
-        Uni<Order> ret = orderRepository.persist(order).onItem().invoke(savedOrder -> {
-            OrderEvent orderEvent = OrderEvent.builder().order(savedOrder).type(OrderEventType.CREATED).build();
-            publishService.publishOrderEvent(orderEvent);
-        });
-        return ret;
+
+        return orderRepository.persistAndFlush(order)
+                .onItem().invoke(pesistedOrder -> {
+                    Log.info("Order created " + pesistedOrder.getId() + " about to notify");
+                    NotificationDto dto = NotificationDto.builder().to("david.thibau@gmail.com")
+                            .subject("Order created").text(order.toString()).build();
+                    notificationService.sendMail(dto).subscribe().with(
+                            n -> Log.info("Notification sent " + n),
+                            f -> Log.error("Error sending notification " + f));
+                })
+                .onItem().invoke(pesistedOrder -> {
+                    Log.info("Order created " + pesistedOrder.getId() + " about to publish");
+                    publishService
+                            .publishOrderEvent(OrderEvent.builder().type(OrderEventType.CREATED).order(pesistedOrder).build());
+                });
+
     }
 
     @WithTransaction
