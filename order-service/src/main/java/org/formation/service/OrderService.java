@@ -13,12 +13,16 @@ import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import org.formation.domain.event.OrderEvent;
+import org.formation.domain.event.OrderEventType;
 
 @ApplicationScoped
 public class OrderService {
     
     @Inject
     OrderRepository orderRepository;
+    @Inject
+    PublishService publishService;
 
     @WithTransaction
     public Uni<Order> createOrder(List<OrderItem> lineItems, Address deliveryAddress, PaymentInformation paymentInformation) {
@@ -29,9 +33,14 @@ public class OrderService {
 		order.setOrderItems(lineItems);
 		order.setPaymentInformation(paymentInformation);
         
-        return orderRepository.persist(order);
+        Uni<Order> ret = orderRepository.persist(order).onItem().invoke(savedOrder -> {
+            OrderEvent orderEvent = OrderEvent.builder().order(savedOrder).type(OrderEventType.CREATED).build();
+            publishService.publishOrderEvent(orderEvent);
+        });
+        return ret;
     }
 
+    @WithTransaction
     public Uni<List<Order>> findAll() {
         return orderRepository.listAll();
     }
