@@ -6,3 +6,6 @@ insert into Livraison ( noCommande, creationDate, status, livreur_id) values ( 1
 insert into Livraison ( noCommande, creationDate, status, livreur_id) values ( 2, '2024-01-01 12:00:00', 'CREE', null);
 insert into Livraison ( noCommande, creationDate, status, livreur_id) values ( 3, '2024-01-01 12:00:00', 'CREE', null);
 insert into Livraison ( noCommande, creationDate, status, livreur_id) values ( 4, '2024-01-01 12:00:00', 'CREE', null);
+
+
+ALTER SEQUENCE livreur_seq RESTART WITH 1000;

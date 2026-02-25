@@ -1,6 +1,7 @@
 package org.formation.web;
 
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import org.formation.domain.Livreur;
 import org.jboss.resteasy.reactive.ResponseStatus;
@@ -16,7 +17,7 @@ public class LivreurController {
     // Créer un livreur
     @POST
     @ResponseStatus(201) // CREATED
-    public Livreur createLivreur(Livreur livreur) {
+    public Livreur createLivreur(@Valid Livreur livreur) {
         livreur.persist();
         return livreur;
     }
