@@ -10,6 +10,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -25,6 +26,7 @@ import org.formation.service.LivraisonService;
 @Logged
 @Log
 @RequiredArgsConstructor
+@Transactional
 public class LivraisonServiceImpl implements LivraisonService {
 
     @ConfigProperty(name = "quarkus.http.port")
@@ -42,8 +44,10 @@ public class LivraisonServiceImpl implements LivraisonService {
 
     @Override
     public Optional<Livraison> load(Long id) {
-        return entityManager.find(Livraison.class, id) != null ?
-                      Optional.of(entityManager.find(Livraison.class, id)) : Optional.empty();
+        return Optional.ofNullable((Livraison)entityManager.createQuery("from Livraison l " +
+                        "left join fetch l.livreur liv left join fetch liv.reviews where l.id = :id")
+                .setParameter("id",id).getSingleResult());
+
     }
 
     @Override

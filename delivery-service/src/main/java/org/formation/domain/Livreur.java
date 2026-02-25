@@ -2,6 +2,7 @@ package org.formation.domain;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -9,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.formation.web.views.LivraisonViews;
 
 
 @Data
@@ -16,7 +18,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@JsonView(LivraisonViews.Complet.class)
 public class Livreur extends PanacheEntity {
+
+	@JsonView(LivraisonViews.Base.class)
+	public Long getId() {
+		return id;
+	}
 
 	public String nom;
 	

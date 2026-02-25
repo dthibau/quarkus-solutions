@@ -3,6 +3,7 @@ package org.formation.web;
 import java.util.List;
 
 
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
@@ -12,6 +13,7 @@ import org.formation.interceptor.Logged;
 import org.formation.service.LivraisonService;
 
 import jakarta.ws.rs.core.MediaType;
+import org.formation.web.views.LivraisonViews;
 import org.jboss.resteasy.reactive.ResponseStatus;
 import org.jboss.resteasy.reactive.RestPath;
 import org.jboss.resteasy.reactive.RestQuery;
@@ -25,12 +27,14 @@ public class LivraisonController {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
 	@Logged
+	@JsonView(LivraisonViews.Base.class)
 	public List<Livraison> findAll() {
 		return livraisonService.findAll();
 	}
 
 	@GET
 	@Path("{id}")
+	@JsonView(LivraisonViews.Complet.class)
 	public Livraison findOne(@RestPath Long id) {
 		return livraisonService.load(id).orElseThrow(() -> new EntityNotFoundException("No such Livraison " + id));
 	}
