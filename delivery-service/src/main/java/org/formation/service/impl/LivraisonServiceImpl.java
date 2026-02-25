@@ -14,12 +14,15 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.formation.config.NotificationServiceConfig;
 import org.formation.domain.Livraison;
 import org.formation.domain.Livreur;
 import org.formation.domain.Status;
 import org.formation.interceptor.Logged;
 import org.formation.service.LivraisonService;
+import org.formation.service.NotificationService;
+import org.formation.service.dto.NotificationDto;
 
 
 @ApplicationScoped
@@ -34,6 +37,9 @@ public class LivraisonServiceImpl implements LivraisonService {
     private final  NotificationServiceConfig notificationServiceConfig;
     private final EntityManager entityManager;
 
+
+    @RestClient
+    NotificationService notificationService;
 
     @Override
     public List<Livraison> findAll() {
@@ -54,6 +60,10 @@ public class LivraisonServiceImpl implements LivraisonService {
     public Livraison create(String noCommande) {
         Livraison livraison = Livraison.builder().noCommande(noCommande).creationDate(Instant.now()).status(Status.CREE).build();
         entityManager.persist(livraison);
+
+        NotificationDto dto = new NotificationDto("toto@gmail.com","Livraison créé","Félicitations",null);
+        log.info(notificationService.sendMail(dto).toString());
+
         return livraison;
     }
 
