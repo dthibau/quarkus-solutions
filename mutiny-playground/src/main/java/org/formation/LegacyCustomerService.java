@@ -1,8 +1,11 @@
 package org.formation;
 
+import jakarta.enterprise.context.Dependent;
+
 import java.math.BigDecimal;
 import java.util.concurrent.CompletableFuture;
 
+@Dependent
 public class LegacyCustomerService {
 
     public CompletableFuture<Customer> findCustomerById(long id) {
