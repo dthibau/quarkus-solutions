@@ -44,6 +44,7 @@ public class LegacyCustomerService {
     }
 
     public CompletableFuture<Customer> findCustomerById(long id) {
+        System.out.println("findByCustomerId");
         return CompletableFuture.supplyAsync(() -> {
             simulateLatency(100);
             if (id <= 0) {

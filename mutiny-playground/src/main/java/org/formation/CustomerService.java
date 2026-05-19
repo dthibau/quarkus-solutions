@@ -1,5 +1,6 @@
 package org.formation;
 
+import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 
@@ -71,5 +72,56 @@ public class CustomerService {
                                                 .onItem().transform(loyalty ->
                                                         new CustomerProfile(customer, order, loyalty))))
                 .onFailure().recoverWithItem(CustomerProfile.empty(customerId));
+    }
+
+    public Uni<CustomerProfile> loadProfileTraced(long customerId) {
+        return Uni.createFrom().completionStage(() -> legacyCustomerService.findCustomerById(customerId))
+                .onItem().invoke(c -> System.out.println("  [trace] customer chargé : " + c.id()))
+                .onItem().transformToUni(customer ->
+                        Uni.createFrom().completionStage(() -> legacyCustomerService.findLastOrder(customer.id()))
+                                .onItem().invoke(o -> System.out.println("  [trace] commande chargée"))
+                                .onItem().transformToUni(order ->
+                                        Uni.createFrom().completionStage(() -> legacyCustomerService.findLoyalty(customer.id()))
+                                                .onItem().invoke(l -> System.out.println("  [trace] fidélité : " + l.tier()))
+                                                .onItem().transform(loyalty ->
+                                                        new CustomerProfile(customer, order, loyalty))));
+    }
+
+    public Multi<Customer> loadCustomers(int count) {
+        // On part d'un Multi qui émet les IDs 1, 2, ..., count
+        // Pour chaque ID, on déclenche un appel asynchrone qui renvoie un Uni<Customer>
+        // transformToUniAndConcatenate convertit chaque Uni en élément du flux résultant
+        return Multi.createFrom().range(1, count + 1)
+                .onItem().transformToUniAndConcatenate(id ->
+                        Uni.createFrom().completionStage(() -> legacyCustomerService.findCustomerById(id)));
+    }
+
+    public Uni<Long> demoNoMemoize(long customerId) {
+        // Ce Uni rejoue findCustomerById à chaque souscription
+        Uni<Customer> customerUni = Uni.createFrom()
+                .completionStage(() -> legacyCustomerService.findCustomerById(customerId));
+
+        // On s'abonne 3 fois au même Uni
+        Uni<Customer> sub1 = customerUni.onItem().invoke(c -> System.out.println("  [no-memoize] sub1"));
+        Uni<Customer> sub2 = customerUni.onItem().invoke(c -> System.out.println("  [no-memoize] sub2"));
+        Uni<Customer> sub3 = customerUni.onItem().invoke(c -> System.out.println("  [no-memoize] sub3"));
+
+        return Uni.combine().all().unis(sub1, sub2, sub3)
+                .with((c1, c2, c3) -> c1.id());
+    }
+
+    public Uni<Long> demoMemoize(long customerId) {
+        // Ce Uni rejoue findCustomerById à chaque souscription
+        Uni<Customer> customerUni = Uni.createFrom()
+                .completionStage(() -> legacyCustomerService.findCustomerById(customerId))
+                .memoize().indefinitely();
+
+        // On s'abonne 3 fois au même Uni
+        Uni<Customer> sub1 = customerUni.onItem().invoke(c -> System.out.println("  [memoize] sub1"));
+        Uni<Customer> sub2 = customerUni.onItem().invoke(c -> System.out.println("  [memoize] sub2"));
+        Uni<Customer> sub3 = customerUni.onItem().invoke(c -> System.out.println("  [memoize] sub3"));
+
+        return Uni.combine().all().unis(sub1, sub2, sub3)
+                .with((c1, c2, c3) -> c1.id());
     }
 }
