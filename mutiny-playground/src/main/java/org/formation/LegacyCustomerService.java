@@ -4,10 +4,45 @@ import jakarta.enterprise.context.Dependent;
 
 import java.math.BigDecimal;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Dependent
 public class LegacyCustomerService {
 
+    private final AtomicInteger callCount = new AtomicInteger(0);
+
+    /**
+     * Variante "instable" de findLoyalty : simule un service réel défaillant.
+     *  - 60 % des appels échouent avec une RuntimeException
+     *  - 20 % des appels prennent 1 seconde au lieu de 100 ms (lenteur anormale)
+     *  - 20 % des appels répondent normalement
+     *
+     * Utilisée pour démontrer retry, timeout et fallback.
+     */
+    public CompletableFuture<Loyalty> findLoyaltyUnstable(long customerId) {
+        return CompletableFuture.supplyAsync(() -> {
+            int call = callCount.incrementAndGet();
+            double dice = ThreadLocalRandom.current().nextDouble();
+
+            if (dice < 0.6) {
+                simulateLatency(50);
+                System.out.println("  [findLoyaltyUnstable #" + call + "] échec");
+                throw new RuntimeException("Service de fidélité indisponible");
+            }
+            if (dice < 0.8) {
+                System.out.println("  [findLoyaltyUnstable #" + call + "] lenteur anormale");
+                simulateLatency(1000);
+            } else {
+                System.out.println("  [findLoyaltyUnstable #" + call + "] succès");
+                simulateLatency(100);
+            }
+            String tier = (customerId % 3 == 0) ? "GOLD"
+                    : (customerId % 2 == 0) ? "SILVER" : "BRONZE";
+            return new Loyalty(tier);
+        });
+    }
+    
     public CompletableFuture<Customer> findCustomerById(long id) {
         return CompletableFuture.supplyAsync(() -> {
             simulateLatency();
@@ -46,9 +81,9 @@ public class LegacyCustomerService {
                 .exceptionally(ex -> CustomerProfile.empty(customerId));
     }
 
-    private static void simulateLatency() {
+    private static void simulateLatency(long latency) {
         try {
-            Thread.sleep(100);
+            Thread.sleep(latency);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
