@@ -1,6 +1,7 @@
 package org.formation;
 
 import io.smallrye.common.annotation.Blocking;
+import io.smallrye.common.annotation.NonBlocking;
 import io.smallrye.common.annotation.RunOnVirtualThread;
 import io.smallrye.mutiny.Uni;
 import jakarta.ws.rs.GET;
@@ -38,8 +39,17 @@ public class BenchmarkResource {
         sleep(200); // Même coût “E/S” mais sans monopoliser un worker physique
         return new ResponseDto("virtual", 200);
     }
+
+    @GET @Path("/bad-guy")
+    @NonBlocking
+    public ResponseDto badGuy() {
+        sleep(200);
+        return new ResponseDto("bad", 200);
+    }
     private void sleep(long ms) {
         try { Thread.sleep(ms); } catch (InterruptedException ignored) {}
     }
     public record ResponseDto(String model, long simulatedLatencyMs) {}
+
+
 }
