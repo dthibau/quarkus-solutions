@@ -25,4 +25,10 @@ public class CustomerResource {
     public Uni<CustomerProfile> getParrallel(@PathParam("id") long id) {
         return customerService.loadProfileParallel(id);
     }
+
+    @GET
+    @Path("{id}/resilient")
+    public Uni<CustomerProfile> getResilient(@PathParam("id") long id) {
+        return customerService.loadProfileResilient(id);
+    }
 }

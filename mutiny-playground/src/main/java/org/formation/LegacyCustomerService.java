@@ -42,10 +42,10 @@ public class LegacyCustomerService {
             return new Loyalty(tier);
         });
     }
-    
+
     public CompletableFuture<Customer> findCustomerById(long id) {
         return CompletableFuture.supplyAsync(() -> {
-            simulateLatency();
+            simulateLatency(100);
             if (id <= 0) {
                 throw new IllegalArgumentException("Invalid customer id: " + id);
             }
@@ -55,14 +55,14 @@ public class LegacyCustomerService {
 
     public CompletableFuture<Order> findLastOrder(long customerId) {
         return CompletableFuture.supplyAsync(() -> {
-            simulateLatency();
+            simulateLatency(100);
             return new Order(1000L + customerId, BigDecimal.valueOf(42.50).add(BigDecimal.valueOf(customerId)));
         });
     }
 
     public CompletableFuture<Loyalty> findLoyalty(long customerId) {
         return CompletableFuture.supplyAsync(() -> {
-            simulateLatency();
+            simulateLatency(100);
             String tier = switch ((int) (customerId % 3)) {
                 case 0 -> "GOLD";
                 case 1 -> "SILVER";

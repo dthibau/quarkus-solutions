@@ -3,6 +3,7 @@ package org.formation;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
 
+import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 
 @ApplicationScoped
@@ -12,6 +13,21 @@ public class CustomerService {
 
     public CustomerService(LegacyCustomerService legacyCustomerService) {
         this.legacyCustomerService = legacyCustomerService;
+    }
+
+    public Uni<CustomerProfile> loadProfileResilient(long customerId) {
+        return Uni.createFrom().completionStage(() -> legacyCustomerService.findCustomerById(customerId))
+                .onItem().transformToUni(customer ->
+                        Uni.createFrom().completionStage(() -> legacyCustomerService.findLastOrder(customer.id()))
+                                .onItem().transformToUni(order ->
+                                        // Appel au service instable, avec résilience
+                                        Uni.createFrom().completionStage(() -> legacyCustomerService.findLoyaltyUnstable(customer.id()))
+                                                .ifNoItem().after(Duration.ofMillis(500))
+                                                .failWith(new RuntimeException("Loyalty trop lent"))
+                                                .onFailure().retry().atMost(3)
+                                                .onFailure().recoverWithItem(Loyalty.unknown())
+                                                .onItem().transform(loyalty ->
+                                                        new CustomerProfile(customer, order, loyalty))));
     }
 
     public Uni<CustomerProfile> loadProfileParallel(long customerId) {
