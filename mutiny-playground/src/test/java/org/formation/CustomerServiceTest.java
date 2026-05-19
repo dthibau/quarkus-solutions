@@ -1,5 +1,8 @@
 package org.formation;
 
+import io.quarkus.test.junit.QuarkusTest;
+import io.smallrye.mutiny.helpers.test.UniAssertSubscriber;
+import jakarta.inject.Inject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -8,17 +11,33 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
+@QuarkusTest
 class CustomerServiceTest {
 
+    @Inject
     private CustomerService service;
 
-    @BeforeEach
-    void setUp() {
-        service = new CustomerService(new LegacyCustomerService());
-    }
+    @Test
+    void loadProfile_returnsAggregatedData() {
+        UniAssertSubscriber<CustomerProfile> subscriber =
+                service.loadProfile(42L)
+                        .subscribe().withSubscriber(UniAssertSubscriber.create());
 
+        CustomerProfile profile = subscriber
+                .awaitItem()
+                .assertCompleted()
+                .getItem();
+
+        assertThat(profile.customer().id()).isEqualTo(42L);
+        assertThat(profile.customer().name()).isEqualTo("Customer-42");
+        assertThat(profile.order()).isNotNull();
+        assertThat(profile.customer().id()).isEqualTo(42L);
+        assertThat(profile.loyalty()).isNotNull();
+        assertThat(profile.loyalty().tier()).isIn("BRONZE", "SILVER", "GOLD");
+    }
 
 
     @Test
