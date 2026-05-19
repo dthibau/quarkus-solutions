@@ -24,7 +24,9 @@ public class CustomerService {
                                         Uni.createFrom().completionStage(() -> legacyCustomerService.findLoyaltyUnstable(customer.id()))
                                                 .ifNoItem().after(Duration.ofMillis(500))
                                                 .failWith(new RuntimeException("Loyalty trop lent"))
-                                                .onFailure().retry().atMost(3)
+                                                .onFailure().retry()
+                                                    .withBackOff(Duration.ofMillis(100), Duration.ofSeconds(2))
+                                                    .withJitter(0.5).atMost(3)
                                                 .onFailure().recoverWithItem(Loyalty.unknown())
                                                 .onItem().transform(loyalty ->
                                                         new CustomerProfile(customer, order, loyalty))));
