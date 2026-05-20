@@ -9,6 +9,7 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import org.formation.domain.OrderRepository;
 import org.formation.domain.Order;
+import org.formation.service.EnrichedOrder;
 import org.formation.service.OrderService;
 import org.jboss.resteasy.reactive.RestPath;
 import org.jboss.resteasy.reactive.RestResponse;
@@ -32,7 +33,7 @@ public class OrderResource {
 
     @GET
     @Path("/{id}")
-    public Uni<Order> getOrder(@RestPath long id) {
+    public Uni<EnrichedOrder> getOrder(@RestPath long id) {
         return orderService.findById(id);
     }
 

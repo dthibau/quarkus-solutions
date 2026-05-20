@@ -86,7 +86,7 @@ class OrderServiceTest {
 
         asserter.assertThat(
                 () -> Panache.withTransaction(() -> orderService.findById((Long)asserter.getData("id"))),
-                order -> assertEquals((Long)asserter.getData("id"), order.getId()));
+                order -> assertEquals((Long)asserter.getData("id"), order.order().getId()));
 
         asserter.assertNotNull(() -> cache.get("order:" + (Long)asserter.getData("id")));   // pas de tx ici
 
@@ -94,7 +94,7 @@ class OrderServiceTest {
 
         asserter.assertThat(
                 () -> Panache.withTransaction(() -> orderService.findById((Long)asserter.getData("id"))),
-                order -> assertEquals((Long)asserter.getData("id"), order.getId()));
+                order -> assertEquals((Long)asserter.getData("id"), order.order().getId()));
 
         asserter.execute(() -> redis.key().del("order:" + (Long)asserter.getData("id")));
     }
