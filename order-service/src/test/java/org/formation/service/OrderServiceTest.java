@@ -2,13 +2,11 @@ package org.formation.service;
 
 import io.quarkus.test.TestReactiveTransaction;
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.vertx.RunOnVertxContext;
 import io.quarkus.test.vertx.UniAsserter;
 import jakarta.inject.Inject;
 import org.formation.domain.Address;
 import org.formation.domain.OrderItem;
 import org.formation.domain.PaymentInformation;
-import org.formation.service.OrderService;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -24,7 +22,6 @@ class OrderServiceTest {
     @Test
     @TestReactiveTransaction
     void shouldCreateOrder(UniAsserter asserter) {
-
         // GIVEN
         Address address = new Address();
         address.setRue("10 rue de Belleville");
