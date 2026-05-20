@@ -2,8 +2,12 @@ package org.formation.service;
 
 
 import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
+import io.quarkus.redis.datasource.ReactiveRedisDataSource;
+import io.quarkus.redis.datasource.value.ReactiveValueCommands;
+import io.quarkus.redis.datasource.value.ValueCommands;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.persistence.EntityNotFoundException;
 import org.formation.domain.*;
 
 import java.time.Instant;
@@ -15,10 +19,22 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final EventRepository eventRepository;
+    private final ReactiveValueCommands<String, Order> cache;
 
-    public OrderService(OrderRepository orderRepository, EventRepository eventRepository) {
+    public OrderService(OrderRepository orderRepository, EventRepository eventRepository,
+                        ReactiveRedisDataSource redis) {
         this.orderRepository = orderRepository;
         this.eventRepository = eventRepository;
+        this.cache = redis.value(Order.class);
+    }
+
+    public Uni<Order> findById(long id) {
+        String key = "order:" + id;
+        return cache.get(key)
+                .onItem().ifNull().switchTo(() ->
+                        orderRepository.findById(id)
+                                .onItem().ifNull().failWith(() -> new EntityNotFoundException(id + " introuvable"))
+                                .call(o -> cache.setex(key, 60, o)));
     }
 
     public Uni<Order> createOrder(List<OrderItem> lineItems, Address deliveryAddress, PaymentInformation paymentInformation) {
