@@ -22,6 +22,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final EventRepository eventRepository;
     private final ReactiveValueCommands<String, Order> cache;
+    private final PublishService publishService;
 
     @RestClient
     CatalogClient catalogClient;
@@ -29,10 +30,12 @@ public class OrderService {
     StockClient   stockClient;
 
     public OrderService(OrderRepository orderRepository, EventRepository eventRepository,
-                        ReactiveRedisDataSource redis) {
+                        ReactiveRedisDataSource redis,
+                        PublishService publishService) {
         this.orderRepository = orderRepository;
         this.eventRepository = eventRepository;
         this.cache = redis.value(Order.class);
+        this.publishService = publishService;
     }
 
     public Uni<EnrichedOrder> findById(long id) {
@@ -85,6 +88,7 @@ public class OrderService {
                     event.setDate(Instant.now());
 
                     return eventRepository.persist(event)
+                            .chain(() -> publishService.publish(event))
                             .replaceWith(persistedOrder);
                 });
     }
